@@ -1,0 +1,118 @@
+"use client";
+
+import Image from "next/image";
+
+export interface CaseStudyMedia {
+  type: "image" | "video";
+  src: string;
+  aspectRatio: string;
+}
+
+export interface CaseStudySection {
+  sidebarTitle?: string;
+  sidebarDescription?: string;
+  sidebarItems: { label: string; isActive?: boolean }[];
+  title?: string;
+  description?: string;
+  overview?: string;
+  impact?: string;
+  images: CaseStudyMedia[];
+}
+
+export interface ProjectDetail {
+  duration?: string;
+  role?: string;
+  context?: string[];
+  contextHeadline?: string;
+  sections: CaseStudySection[];
+}
+
+export interface Project {
+  id: string;
+  title: string;
+  year: string;
+  isDark: boolean;
+  logo?: React.ReactNode;
+  centerImage?: string;
+  centerImageSize?: { width: number; height: number };
+  backgroundImage?: string;
+  backgroundGradient?: string;
+  tags?: string[];
+  hoverDescription?: string;
+  detail?: ProjectDetail;
+}
+
+interface ProjectCardProps {
+  project: Project;
+  onClick?: () => void;
+}
+
+export default function ProjectCard({ project, onClick }: ProjectCardProps) {
+  const bgStyle = project.isDark
+    ? {
+        backgroundImage:
+          project.id === "gotham"
+            ? "linear-gradient(181deg, rgba(255,255,255,0.2) 52%, rgba(255,255,255,0) 81%), linear-gradient(90deg, #18181b 0%, #18181b 100%)"
+            : "linear-gradient(181deg, rgba(255,255,255,0) 52%, rgba(255,255,255,0.2) 81%), linear-gradient(90deg, #18181b 0%, #18181b 100%)",
+      }
+    : project.backgroundGradient
+      ? { backgroundImage: project.backgroundGradient }
+      : undefined;
+
+  return (
+    <div
+      onClick={onClick}
+      className={`relative flex h-[349px] w-[556px] cursor-pointer flex-col items-start justify-end overflow-hidden rounded-[16px] border border-border px-6 py-5 ${
+        project.isDark ? "" : "bg-white"
+      }`}
+      style={bgStyle}
+    >
+      {/* Background image */}
+      {project.backgroundImage && (
+        <div className={project.id === "baba" ? "absolute bottom-0 right-0 w-full h-[231px]" : "absolute inset-0"}>
+          <Image
+            src={project.backgroundImage}
+            alt=""
+            fill
+            className="object-cover pointer-events-none"
+          />
+        </div>
+      )}
+      {project.centerImage && (
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <Image
+            src={project.centerImage}
+            alt=""
+            width={project.centerImageSize?.width ?? 160}
+            height={project.centerImageSize?.height ?? 140}
+            className="pointer-events-none"
+            unoptimized={project.centerImage.endsWith(".svg")}
+          />
+        </div>
+      )}
+
+      {/* Bottom bar */}
+      <div className="relative z-10 flex w-full items-center justify-between">
+        <div className="flex items-center gap-3">
+          {project.logo}
+          {!project.logo && (
+            <p
+              className={`text-[20px] font-medium leading-[25px] ${
+                project.isDark ? "text-[#fafafa]" : "text-[#09090b]"
+              }`}
+            >
+              {project.title}
+            </p>
+          )}
+        </div>
+        <p
+          className={`text-[15px] leading-[20px] tracking-[-0.06px] ${
+            project.isDark ? "text-[#a1a1aa]" : "text-[#09090b]"
+          }`}
+        >
+          {project.year}
+        </p>
+      </div>
+    </div>
+  );
+}

@@ -39,7 +39,15 @@ Personal design portfolio website for Delora Li, showcasing work, projects, and 
 - **Language:** TypeScript
 
 ## Project Structure
-- TBD
+```
+src/
+  app/            # Next.js App Router pages and layouts
+  components/
+    ui/           # shadcn/ui components (Button, Card, etc.)
+  lib/            # Utility functions (cn helper, etc.)
+```
 
 ## Development
-- TBD
+- `npm run dev` — start dev server (Turbopack)
+- `npm run build` — production build
+- `npm run lint` — run ESLint
