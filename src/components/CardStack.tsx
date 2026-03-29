@@ -225,29 +225,43 @@ const projects: Project[] = [
       </div>
     ),
     detail: {
-      duration: "February 2026 · 2 weeks",
+      duration: "February 2026 • 2 weeks",
       role: "I was a product designer on a 2 week contract duration for Baba, an eldercare start-up providing care advocates to seniors. Over the course of the two weeks, I redesigned the patient experience, from the application to the onboarding process.",
+      contextHeadline:
+        "Baba is a eldercare advocacy startup, which matches senior patients with care advocates who can help them acquire the care and services they need.",
+      context: [
+        "A Baba advocate helps their patient understand benefits, resolve billing disputes, and cut through insurance red tape—but the existing patient experience didn't clearly communicate what Baba does, or guide patients through the multi-step onboarding process to connect with their advocate.",
+      ],
       sections: [
         {
-          sidebarTitle: "Patient Onboarding: The first 8 minutes",
-          sidebarDescription:
-            "Patients didn't know what Baba was, and what they were signing up for. This onboarding flow's goal was to directly tie the care advocate program to the patient's specific need clearly, so they could understand the exact service they can expect.",
-          sidebarItems: [],
+          sidebarTitle: "The solution",
+          sidebarItems: [
+            { label: "Patient onboarding", isActive: true },
+            { label: "Initial consultation and advocate matching" },
+          ],
+          title: "The first 8 minutes: Patient Onboarding",
+          overview:
+            "Patients didn't know what Baba was, and what they were signing up for. Most patients would click on a Baba ad because they wanted a wheelchair, but didn't realize that in order to receive their wheelchair, they would need to actually match with a care advocate who can then navigate the process for them.",
+          impact:
+            "By breaking down the onboarding flow, I concluded that the current flow only showed action and form items, but didn't guide or educate the patient on the process. The new redesigned onboarding flow's goal was to directly tie the care advocate program to the patient's specific need clearly, so they could understand the exact service they can expect.",
           images: [
             { type: "video", src: "/projects/Baba-first-onboarding.mov", aspectRatio: "1000/708" },
           ],
-        },
-        {
-          sidebarTitle: "Patient Landing: The first week",
-          sidebarDescription:
-            "The process to connect with a care advocate involves several steps over 3-5 days. Patients must first have a consultation with a doctor and receive a care plan before being matched with an advocate and completing an introductory call, but the existing UX didn't clearly communicate and guide patients through this process. The proposed solution clearly outlines the next steps, the onboarding process, and the identity of their assigned advocate.",
-          sidebarItems: [],
-          images: [
-            { type: "video", src: "/projects/baba-onboarding.mov", aspectRatio: "2912/1820" },
+          imageGroups: [
+            {
+              title: "The first week: Initial consultation and advocate matching",
+              overview:
+                "Similar to above, patients didn't understand the entire process of matching with an advocate. The existing process to connect with a care advocate involves several steps over 3-5 days:\nPatients must first have a consultation with a doctor and receive a care plan before being matched with an advocate and completing an introductory call.\n\nThe existing UX didn't clearly communicate and guide patients through this process.",
+              impact:
+                "By identifying and designing around the different states in the patient's onboarding and matching process, I redesigned the flow from initial consultation to completed advocate intro call to the steady state of the platform. The new solution's goal is to clearly outlines the identified next steps, the onboarding process, and the identity of their assigned advocate, so the patient has a clear idea of where they are in the process and what they have left to complete.",
+              images: [
+                { type: "video", src: "/projects/baba-onboarding.mov", aspectRatio: "2912/1820" },
+              ],
+            },
           ],
         },
         {
-          sidebarTitle: "Screen keyframes.",
+          sidebarTitle: "Final keyframes.",
           sidebarItems: [
             { label: "Initial consultation", isActive: true },
             { label: "Advocate matching" },
@@ -270,18 +284,43 @@ const projects: Project[] = [
             { label: "Ideation: Needed features and actions" },
             { label: "Low fidelity Thumbnails" },
           ],
-          images: [
-            { type: "image", src: "/projects/baba-process-1.png", aspectRatio: "4096/2645" },
-            { type: "image", src: "/projects/baba-process-2.png", aspectRatio: "4096/3068" },
-            { type: "image", src: "/projects/baba-process-3.png", aspectRatio: "4096/2699" },
+          images: [],
+          imageGroups: [
+            {
+              title: "Decomposition: Stages of Patient onboarding",
+              description:
+                "I broke down the patient journey into discrete stages—from first hearing about Baba, through the application, consultation scheduling, advocate matching, and finally the introductory call. This decomposition helped identify the key moments where patients were dropping off or getting confused.",
+              images: [
+                { type: "image", src: "/projects/baba-process-1.png", aspectRatio: "4096/2645" },
+              ],
+            },
+            {
+              title: "Ideation: Needed features and actions",
+              description:
+                "For each stage, I mapped out the required features and user actions. This included progress indicators, clear CTAs, contextual help, and status updates that would keep patients informed and engaged throughout the multi-day onboarding process.",
+              images: [
+                { type: "image", src: "/projects/baba-process-2.png", aspectRatio: "4096/3068" },
+              ],
+            },
+            {
+              title: "Low fidelity Thumbnails",
+              description:
+                "Rapid thumbnail sketches helped me explore multiple layout approaches before committing to high-fidelity designs. This stage focused on information hierarchy and flow rather than visual polish.",
+              images: [
+                { type: "image", src: "/projects/baba-process-3.png", aspectRatio: "4096/2699" },
+              ],
+            },
           ],
         },
         {
-          sidebarTitle: "Mobile Patient Onboarding",
+          sidebarTitle: "Mobile Patient experience",
           sidebarItems: [
             { label: "Part 1: Mobile onboarding", isActive: true },
             { label: "Part 2: Mobile onboarding" },
           ],
+          title: "Mobile Patient Experience",
+          description:
+            "Translated the patient experience for desktop into a mobile web app format.",
           images: [
             { type: "image", src: "/projects/baba-mobile-1.png", aspectRatio: "2584/2106" },
             { type: "image", src: "/projects/baba-mobile-2.png", aspectRatio: "2584/2462" },
@@ -324,11 +363,131 @@ const projects: Project[] = [
     title: "Kickback",
     year: "2024",
     isDark: true,
-    tags: ["Consumer", "Social", "Side Project"],
+    tags: ["Consumer App", "Social Media", "Personal Project"],
     hoverDescription:
-      "A social platform for organizing group activities and events with friends.",
-    centerImage: "/projects/kickback-screenshot.png",
+      "A social platform where friends can effortlessly plan hangouts — eliminating endless group chat coordination.",
+    centerImage: "/projects/kickback-phone-mockup.png",
     centerImageSize: { width: 230, height: 470 },
+    centerImageOffset: { y: 127 },
+    detail: {
+      duration: "February 2026 • 2 weeks",
+      role: "As the product designer, I worked a small team of 3 other developers to create the product narrative, before designing the high fidelity end-to-end workflows and design systems. Responsibilities included product strategy, interaction design, and visual design.",
+      contextHeadline:
+        "Kickback, the \u201CBeReal for friend groups\u201D: a social platform where friends can effortlessly plan hangouts — eliminating the endless group chat coordination and making spontaneous meetups the norm, not the exception.",
+      context: [
+        "Kickback reimagines social planning with four core features that remove friction from getting together. Users can upload photos to each Kickback, a real-time prompt for image sharing with your friends, and see what everyone else in their friend group is up to at that moment.",
+      ],
+      sections: [
+        {
+          sidebarTitle: "The solution",
+          sidebarItems: [
+            { label: "Real-time photo sharing", isActive: true },
+            { label: "Reactions" },
+            { label: "A mosaic of memories" },
+            { label: "Kickback friend groups" },
+          ],
+          images: [],
+          imageGroups: [
+            {
+              title: "Real-time photo sharing.",
+              description:
+                "Each Kickback is a shared moment: One friend starts the day with a photo and optional prompt. Everyone in the group responds within a set window. Photos unlock as friends post, creating a sense of presence and participation.",
+              images: [
+                { type: "image", src: "/projects/kickback-photo-1.png", aspectRatio: "860/1864" },
+                { type: "image", src: "/projects/kickback-photo-2.png", aspectRatio: "860/1864" },
+                { type: "video", src: "/projects/Kickback videos/kickback-partake.mov", aspectRatio: "860/1864" },
+              ],
+            },
+            {
+              title: "React with emojis and comments.",
+              description:
+                "Have a space for reactions, conversations and short quips for each picture a member posts.",
+              layout: "side-by-side",
+              images: [
+                { type: "video", src: "/projects/Kickback videos/kickback-reactions.mov", aspectRatio: "860/1864" },
+                { type: "video", src: "/projects/Kickback videos/Shortcut RXN.mp4", aspectRatio: "860/1864" },
+              ],
+            },
+            {
+              title: "A mosaic of memories.",
+              description:
+                "Daily Kick Backs are saved into your Group Memories become a visual thread of friendship—authentic, casual, and uniquely yours.",
+              images: [
+                { type: "image", src: "/projects/kickback-memories-1.png", aspectRatio: "860/1864" },
+                { type: "image", src: "/projects/kickback-memories-2.png", aspectRatio: "860/1864" },
+                { type: "video", src: "/projects/Kickback videos/kickback-memories.mov", aspectRatio: "860/1864" },
+              ],
+            },
+            {
+              title: "Creating a new Kick Back group.",
+              description:
+                "Groups can be made from new Kick Back posts, sending notifications to each friend that they've been invited to a Kick Back with their new group.",
+              layout: "side-by-side",
+              images: [
+                { type: "video", src: "/projects/Kickback videos/kickback-create-group.mov", aspectRatio: "860/1864" },
+              ],
+            },
+          ],
+        },
+        {
+          sidebarTitle: "The process.",
+          sidebarItems: [
+            { label: "Value proposition", isActive: true },
+            { label: "The narrative" },
+            { label: "Workflow diagrams" },
+            { label: "Iterations" },
+            { label: "Visual design development" },
+          ],
+          images: [],
+          imageGroups: [
+            {
+              title: "Value proposition.",
+              description:
+                "Gen Z relies on group chats to stay close with friends. Market trends show they're using these spaces to prompt real-time photo updates—creating a more intimate, private version of BeReal.\n\nA social app that helps friend groups build intimacy and stay connected through simple, real-time photo and prompt sharing, capitalizing on Gen Z's desire to participate in connection efforts with their close, intimate friend groups online.",
+              images: [],
+            },
+            {
+              title: "The narrative",
+              description:
+                "Through competitive analysis, brainstorming, and ranking of the different ideas we had, we were able to craft a narrative that defined a list of features to achieve our goal, without overcomplicating the solution space.",
+              images: [
+                { type: "image", src: "/projects/kickback-narrative.png", aspectRatio: "732/461" },
+              ],
+            },
+            {
+              title: "Workflow diagrams.",
+              description:
+                "Diagrams and low-fidelity explorations of the core flow — creating a hangout, inviting friends, and the real-time coordination experience.",
+              layout: "vertical",
+              images: [
+                { type: "image", src: "/projects/kickback-workflow.png", aspectRatio: "732/500" },
+                { type: "image", src: "/projects/kickback-wireframe.png", aspectRatio: "732/961" },
+              ],
+            },
+            {
+              title: "Iterations",
+              layout: "vertical",
+              images: [
+                { type: "image", src: "/projects/kickback-lofi.png", aspectRatio: "732/375" },
+                { type: "image", src: "/projects/kickback-midfi.png", aspectRatio: "4096/1570" },
+                { type: "image", src: "/projects/kickback-midfi-2.png", aspectRatio: "594/290" },
+                { type: "image", src: "/projects/kickback-midfi-3.png", aspectRatio: "638/651" },
+              ],
+            },
+            {
+              title: "Visual design library",
+              description:
+                "In the process of developing a visual design library and language, we were able to create polished high-fidelity screens, incorporating all learnings from research and iteration phases.",
+              layout: "vertical",
+              images: [
+                { type: "image", src: "/projects/kickback-typography.png", aspectRatio: "2118/1368" },
+                { type: "image", src: "/projects/kickback-components.png", aspectRatio: "3870/4096" },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   },
 ];
 

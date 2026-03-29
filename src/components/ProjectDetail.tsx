@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
-import type { Project, CaseStudySection, CaseStudyMedia } from "./ProjectCard";
+import type { Project, CaseStudySection, CaseStudyMedia, ImageGroup } from "./ProjectCard";
 import { Badge } from "./ui/badge";
 
 interface ProjectDetailProps {
@@ -15,11 +15,13 @@ interface ProjectDetailProps {
 function SectionSidebar({
   title,
   description,
+  sectionTitle,
   items,
   activeIndex,
 }: {
   title?: string;
   description?: string;
+  sectionTitle?: string;
   items: CaseStudySection["sidebarItems"];
   activeIndex: number;
 }) {
@@ -40,6 +42,13 @@ function SectionSidebar({
             <div className="flex w-full items-center py-3">
               <p className="text-[17px] font-semibold leading-[22px] tracking-[-0.068px] text-foreground">
                 {title}
+              </p>
+            </div>
+          )}
+          {sectionTitle && !title && (
+            <div className="pb-4 w-full">
+              <p className="text-[13px] leading-[18px] tracking-[-0.026px] text-muted-foreground">
+                {sectionTitle}
               </p>
             </div>
           )}
@@ -70,12 +79,14 @@ function MediaElement({
   media: CaseStudyMedia;
   innerRef?: React.Ref<HTMLDivElement>;
 }) {
+  const mdShadow = media.type === "image" ? "none" : "0px 1px 2px rgba(0,0,0,0.03), 0px 2px 6px rgba(0,0,0,0.04), 0px 4px 12px rgba(0,0,0,0.08)";
+
   if (media.type === "video") {
     return (
       <div
         ref={innerRef}
         className="relative w-full rounded-[6px] border border-border overflow-hidden"
-        style={{ aspectRatio: media.aspectRatio }}
+        style={{ aspectRatio: media.aspectRatio, boxShadow: mdShadow }}
       >
         <video
           src={media.src}
@@ -92,7 +103,7 @@ function MediaElement({
     <div
       ref={innerRef}
       className="relative w-full"
-      style={{ aspectRatio: media.aspectRatio }}
+      style={{ aspectRatio: media.aspectRatio, boxShadow: mdShadow }}
     >
       <Image
         src={media.src}
@@ -100,6 +111,123 @@ function MediaElement({
         fill
         className="object-cover pointer-events-none"
       />
+    </div>
+  );
+}
+
+function ImageGroupBlock({
+  group,
+  innerRef,
+}: {
+  group: ImageGroup;
+  innerRef?: React.Ref<HTMLDivElement>;
+}) {
+  if (group.layout === "side-by-side") {
+    const phoneCount = group.images.length;
+    return (
+      <div ref={innerRef} className="flex gap-3 w-full items-end">
+        <div className="flex flex-col gap-4 min-w-0 text-foreground" style={{ width: `calc(${((3 - phoneCount) / 3) * 100}% - ${(12 * phoneCount) / 3}px)` }}>
+          {group.title && (
+            <p className="text-[28px] font-semibold leading-[34px] tracking-[-0.4px]">
+              {group.title}
+            </p>
+          )}
+          {group.description && (
+            <p className="text-[15px] leading-[20px] tracking-[-0.06px]">
+              {group.description}
+            </p>
+          )}
+        </div>
+        {group.images.map((img, i) => (
+          <div
+            key={i}
+            className="relative rounded-[20px] border border-border overflow-hidden"
+            style={{ width: `calc(${100 / 3}% - ${(12 * (3 - 1)) / 3}px)`, aspectRatio: img.aspectRatio }}
+          >
+            {img.type === "video" ? (
+              <video
+                src={img.src}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+              />
+            ) : (
+              <Image
+                src={img.src}
+                alt=""
+                fill
+                className="object-cover pointer-events-none"
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div ref={innerRef} className="flex flex-col gap-[24px] w-full">
+      {group.title && (
+        <p className="text-[28px] font-semibold leading-[34px] tracking-[-0.4px] text-foreground">
+          {group.title}
+        </p>
+      )}
+      {group.overview && (
+        <div className="flex flex-col gap-3 w-full text-foreground">
+          <p className="text-[13px] leading-[18px] tracking-[-0.026px] text-muted-foreground">
+            Problem overview
+          </p>
+          <p className="text-[15px] leading-[20px] tracking-[-0.06px] whitespace-pre-line">
+            {group.overview}
+          </p>
+        </div>
+      )}
+      {group.impact && (
+        <div className="flex flex-col gap-3 w-full text-foreground">
+          <p className="text-[13px] leading-[18px] tracking-[-0.026px] text-muted-foreground">
+            My Impact
+          </p>
+          <p className="text-[15px] leading-[20px] tracking-[-0.06px] whitespace-pre-line">
+            {group.impact}
+          </p>
+        </div>
+      )}
+      {group.description && (
+        <p className="text-[15px] leading-[20px] tracking-[-0.06px] whitespace-pre-line text-foreground">
+          {group.description}
+        </p>
+      )}
+      {group.images.length > 0 && (
+        <div className={group.layout === "vertical" ? "flex flex-col gap-3 w-full" : "flex gap-3 w-full items-start"}>
+          {group.images.map((img, i) => {
+            const isMobileScreen = img.aspectRatio && (() => {
+              const [w, h] = img.aspectRatio.split("/").map(Number);
+              return h > w;
+            })();
+            return (
+              <div
+                key={i}
+                className={
+                  group.layout === "vertical"
+                    ? "w-full"
+                    : isMobileScreen
+                      ? "rounded-[20px] border border-border overflow-hidden"
+                      : "flex-1 min-w-0"
+                }
+                style={
+                  group.layout !== "vertical" && isMobileScreen
+                    ? { width: `calc(${100 / 3}% - ${(12 * 2) / 3}px)` }
+                    : undefined
+                }
+              >
+                <MediaElement media={img} />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -167,14 +295,15 @@ function CaseStudySectionBlock({
       <SectionSidebar
         title={section.sidebarTitle}
         description={section.sidebarDescription}
+        sectionTitle={section.title}
         items={section.sidebarItems}
         activeIndex={activeIndex}
       />
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-6 items-start justify-center py-[72px]">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[24px] items-start justify-center py-[72px]">
         {(section.title || section.description) && (
           <div className="flex flex-col gap-4 w-full text-foreground">
             {section.title && (
-              <p className={hasSidebarTitle ? "text-[28px] font-semibold leading-[34px] tracking-[-0.112px]" : "text-[20px] font-medium leading-[25px]"}>
+              <p className="text-[28px] font-semibold leading-[34px] tracking-[-0.4px]">
                 {section.title}
               </p>
             )}
@@ -188,7 +317,7 @@ function CaseStudySectionBlock({
         {section.overview && (
           <div className="flex flex-col gap-3 w-full text-foreground">
             <p className="text-[13px] leading-[18px] tracking-[-0.026px] text-muted-foreground">
-              Product Overview
+              Problem overview
             </p>
             <p className="text-[15px] leading-[20px] tracking-[-0.06px]">
               {section.overview}
@@ -205,13 +334,45 @@ function CaseStudySectionBlock({
             </p>
           </div>
         )}
-        {section.images.map((img, i) => (
-          <MediaElement
-            key={i}
-            media={img}
-            innerRef={setImageRef(i)}
-          />
-        ))}
+        {section.imageGroups && section.images.length > 0 && (
+          section.images.map((img, i) => (
+            <MediaElement
+              key={`img-${i}`}
+              media={img}
+              innerRef={setImageRef(i)}
+            />
+          ))
+        )}
+        {section.imageGroups ? (
+          <div className={`flex flex-col gap-[64px] w-full${section.images.length > 0 ? " pt-[40px]" : ""}`}>
+            {section.imageGroups.map((group, gi) => (
+              <ImageGroupBlock
+                key={gi}
+                group={group}
+                innerRef={setImageRef(section.images.length + gi)}
+              />
+            ))}
+          </div>
+        ) : section.imageLayout === "horizontal" ? (
+          <div className="flex gap-3 w-full items-start">
+            {section.images.map((img, i) => (
+              <div key={i} className="flex-1 min-w-0">
+                <MediaElement
+                  media={img}
+                  innerRef={setImageRef(i)}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          section.images.map((img, i) => (
+            <MediaElement
+              key={i}
+              media={img}
+              innerRef={setImageRef(i)}
+            />
+          ))
+        )}
       </div>
     </motion.div>
   );

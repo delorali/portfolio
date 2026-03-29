@@ -6,6 +6,16 @@ export interface CaseStudyMedia {
   type: "image" | "video";
   src: string;
   aspectRatio: string;
+  noShadow?: boolean;
+}
+
+export interface ImageGroup {
+  title?: string;
+  description?: string;
+  overview?: string;
+  impact?: string;
+  layout?: "stacked" | "side-by-side" | "vertical";
+  images: CaseStudyMedia[];
 }
 
 export interface CaseStudySection {
@@ -16,7 +26,9 @@ export interface CaseStudySection {
   description?: string;
   overview?: string;
   impact?: string;
+  imageLayout?: "vertical" | "horizontal";
   images: CaseStudyMedia[];
+  imageGroups?: ImageGroup[];
 }
 
 export interface ProjectDetail {
@@ -35,6 +47,7 @@ export interface Project {
   logo?: React.ReactNode;
   centerImage?: string;
   centerImageSize?: { width: number; height: number };
+  centerImageOffset?: { y: number };
   backgroundImage?: string;
   backgroundGradient?: string;
   tags?: string[];
@@ -53,7 +66,7 @@ export default function ProjectCard({ project, onClick }: ProjectCardProps) {
         backgroundImage:
           project.id === "gotham"
             ? "linear-gradient(181deg, rgba(255,255,255,0.2) 52%, rgba(255,255,255,0) 81%), linear-gradient(90deg, #18181b 0%, #18181b 100%)"
-            : "linear-gradient(181deg, rgba(255,255,255,0) 52%, rgba(255,255,255,0.2) 81%), linear-gradient(90deg, #18181b 0%, #18181b 100%)",
+            : "linear-gradient(181deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.06) 90%), linear-gradient(90deg, #18181b 0%, #18181b 100%)",
       }
     : project.backgroundGradient
       ? { backgroundImage: project.backgroundGradient }
@@ -79,7 +92,10 @@ export default function ProjectCard({ project, onClick }: ProjectCardProps) {
         </div>
       )}
       {project.centerImage && (
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={project.centerImageOffset ? { marginTop: project.centerImageOffset.y } : undefined}
+        >
           <Image
             src={project.centerImage}
             alt=""
