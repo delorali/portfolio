@@ -1,9 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowUpRight, Sun, Moon } from "lucide-react";
+import { ArrowUpRight, ArrowLeft, Sun, Moon } from "lucide-react";
 
-export default function Header() {
+interface HeaderProps {
+  isProjectOpen?: boolean;
+  onBack?: () => void;
+}
+
+export default function Header({ isProjectOpen, onBack }: HeaderProps) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -16,8 +21,16 @@ export default function Header() {
   }, [isDark]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-10 py-5 backdrop-blur-[20px]">
-      <p className="flex-1 text-[15px] leading-[20px] tracking-[-0.06px] text-foreground">
+    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4 md:px-10 md:py-5">
+      {isProjectOpen ? (
+        <button
+          onClick={onBack}
+          className="flex md:hidden size-[38px] items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-muted"
+        >
+          <ArrowLeft className="size-4" />
+        </button>
+      ) : null}
+      <p className={`flex-1 text-[15px] leading-[20px] tracking-[-0.06px] text-foreground ${isProjectOpen ? "hidden md:block" : ""}`}>
         delzli
       </p>
       <div className="flex items-center gap-2">

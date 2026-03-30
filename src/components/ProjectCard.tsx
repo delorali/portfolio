@@ -5,8 +5,10 @@ import Image from "next/image";
 export interface CaseStudyMedia {
   type: "image" | "video";
   src: string;
+  darkSrc?: string;
   aspectRatio: string;
   noShadow?: boolean;
+  fillWidth?: boolean;
 }
 
 export interface ImageGroup {
@@ -16,6 +18,7 @@ export interface ImageGroup {
   impact?: string;
   layout?: "stacked" | "side-by-side" | "vertical";
   images: CaseStudyMedia[];
+  customComponent?: string;
 }
 
 export interface CaseStudySection {
@@ -75,14 +78,14 @@ export default function ProjectCard({ project, onClick }: ProjectCardProps) {
   return (
     <div
       onClick={onClick}
-      className={`relative flex h-[349px] w-[556px] cursor-pointer flex-col items-start justify-end overflow-hidden rounded-[16px] border border-border px-6 py-5 ${
+      className={`relative flex w-full md:w-[480px] lg:w-[556px] cursor-pointer flex-col items-start justify-end overflow-hidden rounded-[8px] md:rounded-[16px] border border-border px-4 py-3 md:px-6 md:py-5 ${
         project.isDark ? "" : "bg-white"
       }`}
-      style={bgStyle}
+      style={{ aspectRatio: "556/349", ...bgStyle }}
     >
       {/* Background image */}
       {project.backgroundImage && (
-        <div className={project.id === "baba" ? "absolute bottom-0 right-0 w-full h-[231px]" : "absolute inset-0"}>
+        <div className={project.id === "baba" ? "absolute bottom-0 right-0 w-full h-[66%]" : project.id === "kumu" ? "absolute left-[10.3%] top-[12.9%] w-[78.8%] h-[86.8%]" : "absolute inset-0"}>
           <Image
             src={project.backgroundImage}
             alt=""

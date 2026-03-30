@@ -9,8 +9,9 @@ import { Badge } from "./ui/badge";
 
 export type { Project };
 
-const CARD_HEIGHT = 349;
+const CARD_RATIO = 349 / 556; // aspect ratio height/width
 const STACK_OFFSET = 72;
+const STACK_OFFSET_MOBILE = 51;
 const HOVER_GAP = 8;
 
 const shadowSm =
@@ -334,11 +335,10 @@ const projects: Project[] = [
     title: "kumu",
     year: "2026",
     isDark: false,
-    tags: ["Consumer", "Social", "Side Project"],
+    tags: ["Consumer app", "Study cards", "Personal project", "Fullstack development"],
     hoverDescription:
-      "A social flashcard app designed to make studying more collaborative and engaging.",
-    centerImage: "/projects/kumu-screenshot.png",
-    centerImageSize: { width: 220, height: 420 },
+      "A mobile app that transforms raw study notes into personalized AI-generated flashcard decks and delivers an intelligent coaching experience.",
+    backgroundImage: "/projects/kumu-card-bg.png",
     logo: (
       <div className="flex items-center gap-3">
         <div className="relative h-[24px] w-[22px]">
@@ -357,6 +357,112 @@ const projects: Project[] = [
         </p>
       </div>
     ),
+    detail: {
+      duration: "March 2026 • 1 week",
+      role: "Kumu is a project I independently designed and developed to enhance my skills in fine-tuning and deploying Liquid Fine Models for a straightforward use case. I crafted the project plan and PRD, trained the models, and deployed them within the application, followed by designing the complete key workflows.",
+      contextHeadline:
+        "Kumu is a mobile application that transforms raw study notes into personalized AI-generated flashcard decks and delivers an intelligent coaching experience.",
+      context: [
+        "The app leverages Liquid AI\u2019s fine-tuned Language Foundation Models (LFMs) running via the LEAP Edge SDK for on-device inference, ensuring full privacy and offline capability.",
+      ],
+      sections: [
+        {
+          sidebarTitle: "Kumu: Your personalized study guide.",
+          sidebarItems: [
+            { label: "Core pages", isActive: true },
+            { label: "Generating decks" },
+            { label: "Quizzes and coaching" },
+          ],
+          images: [],
+          imageGroups: [
+            {
+              title: "Core pages",
+              description:
+                "Home, where users can create flashcard decks. All Decks, where users can find all their created card decks, and the Profile, where they can see their study streaks and signout.",
+              images: [
+                { type: "image", src: "/projects/kumu media/Home.png", aspectRatio: "1320/2868" },
+                { type: "image", src: "/projects/kumu media/All decks.png", aspectRatio: "1320/2868" },
+                { type: "image", src: "/projects/kumu media/Profile.png", aspectRatio: "1320/2868" },
+              ],
+            },
+            {
+              title: "Card deck generation",
+              description:
+                "By uploading raw study notes, users can create card decks, which they can study and quiz against.",
+              images: [
+                { type: "video", src: "/projects/kumu media/Generating a card deck.mp4", aspectRatio: "1320/2868" },
+                { type: "image", src: "/projects/kumu media/Card.png", aspectRatio: "1320/2868" },
+                { type: "image", src: "/projects/kumu media/Card list.png", aspectRatio: "1320/2868" },
+              ],
+            },
+            {
+              title: "Quiz on your flash cards, and receive personalized coaching feedback.",
+              description:
+                "With Kumu\u2019s AI coach, receive tailored feedback on each of your answers, whether right or wrong.",
+              layout: "side-by-side",
+              images: [
+                { type: "video", src: "/projects/kumu media/Quiz taking.mp4", aspectRatio: "1320/2868" },
+                { type: "image", src: "/projects/kumu media/Quix complete.png", aspectRatio: "1320/2868" },
+              ],
+            },
+            {
+              images: [
+                { type: "image", src: "/projects/kumu media/Correct.png", aspectRatio: "1320/2868" },
+                { type: "image", src: "/projects/kumu media/Coaching feedback - Correct.png", aspectRatio: "1320/2868" },
+                { type: "image", src: "/projects/kumu media/Coaching feedback - Almost.png", aspectRatio: "1320/2868" },
+              ],
+            },
+          ],
+        },
+        {
+          sidebarTitle: "The process.",
+          sidebarItems: [
+            { label: "Tech stack", isActive: true },
+            { label: "Fine tuning LFMs" },
+            { label: "Iteration" },
+            { label: "Components and Design" },
+          ],
+          images: [],
+          imageGroups: [
+            {
+              title: "Tech stack",
+              images: [
+                { type: "image", src: "/projects/kumu-tech-stack.png", aspectRatio: "2308/1028", fillWidth: true },
+              ],
+            },
+            {
+              title: "Fine tuning LFMs",
+              description:
+                "To train Liquid\u2019s Foundational Models to be able to complete the tasks I had in mind, I created training datasets for both Card Generation and Coaching, which were used to train and evaluate the models.",
+              images: [
+                { type: "image", src: "/projects/kumu-fine-tuning.png", aspectRatio: "2366/596", fillWidth: true },
+              ],
+            },
+            {
+              title: "Iteration",
+              description:
+                "Iteration was a process involving both Claude Code and Figma, generating simple proof of concepts for interactions in Code before porting them into Figma for polish and design. This, while a simple task, was really interesting to conduct, as it flipped the standard enterprise design process on its head, having code be the base that design worked off of.",
+              images: [
+                { type: "image", src: "/projects/kumu-iteration-code.png", aspectRatio: "241/520" },
+                { type: "image", src: "/projects/kumu-iteration-midfi.png", aspectRatio: "1313/2862" },
+                { type: "image", src: "/projects/kumu media/Home.png", aspectRatio: "1320/2868" },
+              ],
+            },
+            {
+              title: "Components and design",
+              description:
+                "The design portion of the project was relatively light, where I identified key components and key frames to be designed, and worked in both Figma and Claude Code to bring them to light.",
+              layout: "vertical",
+              images: [
+                { type: "image", src: "/projects/kumu-components-1.png", aspectRatio: "697/440" },
+                { type: "image", src: "/projects/kumu-components-2.png", aspectRatio: "2504/1998" },
+                { type: "image", src: "/projects/kumu-components-3.png", aspectRatio: "3336/1710" },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   },
   {
     id: "kickback",
@@ -493,40 +599,71 @@ const projects: Project[] = [
 
 interface CardStackProps {
   onExpandChange?: (expanded: boolean) => void;
+  closeRef?: React.MutableRefObject<(() => void) | null>;
 }
 
-export default function CardStack({ onExpandChange }: CardStackProps) {
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isMobile;
+}
+
+export default function CardStack({ onExpandChange, closeRef }: CardStackProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const isMobile = useIsMobile();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Compute card height from actual container width + fixed aspect ratio
+  const [cardH, setCardH] = useState(isMobile ? 232 : 349);
+  useEffect(() => {
+    const update = () => {
+      if (containerRef.current) {
+        const w = containerRef.current.offsetWidth;
+        setCardH(Math.round(w * CARD_RATIO));
+      }
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [isMobile]);
+
+  const stackOff = isMobile ? STACK_OFFSET_MOBILE : STACK_OFFSET;
 
   const getCardY = useCallback(
     (index: number) => {
       if (selectedIndex !== null) {
         if (index === selectedIndex) return 0;
-        if (index < selectedIndex) return -(CARD_HEIGHT + 40);
-        return CARD_HEIGHT + 200;
+        if (index < selectedIndex) return -(cardH + 40);
+        return cardH + 200;
       }
 
       if (hoveredIndex === null) {
-        return index * STACK_OFFSET;
+        return index * stackOff;
       }
 
       // Top card: lift it slightly
       if (hoveredIndex === 0) {
         if (index === 0) return -8;
-        return index * STACK_OFFSET;
+        return index * stackOff;
       }
 
       // Cards above hovered: stay in their stacked position
       if (index < hoveredIndex) {
-        return index * STACK_OFFSET;
+        return index * stackOff;
       }
       // Hovered card + cards below: shift down so hovered card is fully revealed
       // The hovered card needs to clear the card above it
-      const revealOffset = CARD_HEIGHT - STACK_OFFSET + HOVER_GAP;
-      return index * STACK_OFFSET + revealOffset;
+      const revealOffset = cardH - stackOff + HOVER_GAP;
+      return index * stackOff + revealOffset;
     },
-    [hoveredIndex, selectedIndex]
+    [hoveredIndex, selectedIndex, isMobile, cardH, stackOff]
   );
 
   const getCardOpacity = useCallback(
@@ -547,25 +684,29 @@ export default function CardStack({ onExpandChange }: CardStackProps) {
 
   const handleClose = useCallback(() => {
     setSelectedIndex(null);
+    setHoveredIndex(null);
     onExpandChange?.(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [onExpandChange]);
+
+  useEffect(() => {
+    if (closeRef) closeRef.current = handleClose;
+  }, [closeRef, handleClose]);
 
   const isExpanded = selectedIndex !== null;
 
   // Calculate the total height of the card stack based on hover/expand state
   const stackHeight = useMemo(() => {
-    if (isExpanded) return CARD_HEIGHT;
+    if (isExpanded) return cardH;
     if (hoveredIndex === null || hoveredIndex === 0) {
-      return (projects.length - 1) * STACK_OFFSET + CARD_HEIGHT;
+      return (projects.length - 1) * stackOff + cardH;
     }
     // When hovering, the stack expands by the reveal offset
-    const revealOffset = CARD_HEIGHT - STACK_OFFSET + HOVER_GAP;
-    return (projects.length - 1) * STACK_OFFSET + CARD_HEIGHT + revealOffset;
-  }, [hoveredIndex, isExpanded]);
+    const revealOffset = cardH - stackOff + HOVER_GAP;
+    return (projects.length - 1) * stackOff + cardH + revealOffset;
+  }, [hoveredIndex, isExpanded, isMobile, cardH, stackOff]);
 
   // Scroll to center the hovered card when hover changes
-  const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (hoveredIndex === null || isExpanded) return;
 
@@ -573,10 +714,10 @@ export default function CardStack({ onExpandChange }: CardStackProps) {
     if (hoveredIndex === 0) {
       cardY = -8;
     } else {
-      const revealOffset = CARD_HEIGHT - STACK_OFFSET + HOVER_GAP;
-      cardY = hoveredIndex * STACK_OFFSET + revealOffset;
+      const revealOffset = cardH - stackOff + HOVER_GAP;
+      cardY = hoveredIndex * stackOff + revealOffset;
     }
-    const cardCenter = cardY + CARD_HEIGHT / 2;
+    const cardCenter = cardY + cardH / 2;
 
     const container = containerRef.current;
     if (!container) return;
@@ -584,13 +725,13 @@ export default function CardStack({ onExpandChange }: CardStackProps) {
     const targetScroll = containerTop + cardCenter - window.innerHeight / 2;
 
     window.scrollTo({ top: targetScroll, behavior: "smooth" });
-  }, [hoveredIndex, isExpanded]);
+  }, [hoveredIndex, isExpanded, isMobile, cardH, stackOff]);
 
   return (
-    <div className="flex flex-col items-center w-full">
+    <div className="flex flex-col items-center w-full px-5 md:px-0">
       <motion.div
         ref={containerRef}
-        className="relative w-[556px]"
+        className="relative w-full md:w-[480px] lg:w-[556px]"
         animate={{ height: stackHeight }}
         transition={springTransition}
         onMouseLeave={() => {
@@ -613,8 +754,8 @@ export default function CardStack({ onExpandChange }: CardStackProps) {
             }}
           >
             <div className="relative">
-              {/* Tags — left side, behind card */}
-              {project.tags && !isExpanded && (
+              {/* Tags — left side, behind card (desktop only) */}
+              {project.tags && !isExpanded && !isMobile && (
                 <div className="absolute left-[-40px] top-1/2 -translate-x-full -translate-y-1/2 flex flex-col gap-1 items-end pointer-events-none z-0">
                   {project.tags.map((tag, i) => (
                     <motion.div
@@ -636,8 +777,8 @@ export default function CardStack({ onExpandChange }: CardStackProps) {
                   ))}
                 </div>
               )}
-              {/* Description — right side, behind card */}
-              {project.hoverDescription && !isExpanded && (
+              {/* Description — right side, behind card (desktop only) */}
+              {project.hoverDescription && !isExpanded && !isMobile && (
                 <motion.div
                   className="absolute right-[-40px] top-1/2 translate-x-full -translate-y-1/2 pointer-events-none w-[204px] z-0"
                   initial={{ opacity: 0, x: -40 }}
@@ -659,10 +800,10 @@ export default function CardStack({ onExpandChange }: CardStackProps) {
               <motion.div
                 animate={{
                   boxShadow:
-                    hoveredIndex === index && !isExpanded ? shadowLg : shadowSm,
+                    (hoveredIndex === index && !isExpanded) || (isExpanded && index === selectedIndex) ? shadowLg : shadowSm,
                 }}
                 transition={springTransition}
-                className="relative z-10 rounded-[16px]"
+                className="relative z-10 rounded-[8px] md:rounded-[16px]"
               >
                 <ProjectCard
                   project={project}

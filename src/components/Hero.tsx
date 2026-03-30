@@ -15,10 +15,10 @@ const springTransition = {
 
 export default function Hero() {
   return (
-    <section className="flex h-[120px] items-end px-[240px] w-full">
-      <div className="flex flex-1 flex-col gap-4 items-start">
+    <section className="flex flex-col md:flex-row md:h-[120px] md:items-end px-5 md:px-[80px] lg:px-[240px] w-full gap-6 md:gap-0">
+      <div className="flex flex-1 flex-col gap-3 md:gap-4 items-start">
         <motion.h1
-          className="text-[54px] font-semibold leading-[56px] tracking-[-0.594px] text-foreground"
+          className="text-[36px] md:text-[54px] font-semibold leading-[1.1] md:leading-[56px] tracking-[-0.04em] text-foreground"
           {...fadeUp}
           transition={{ ...springTransition, delay: 0 }}
         >
@@ -29,10 +29,10 @@ export default function Hero() {
           {...fadeUp}
           transition={{ ...springTransition, delay: 0.1 }}
         >
-          <p className="text-[17px] font-semibold leading-[22px] tracking-[-0.068px] text-foreground">
+          <p className="text-[15px] md:text-[17px] md:font-semibold leading-[20px] md:leading-[22px] tracking-[-0.06px] md:tracking-[-0.068px] text-foreground">
             Leading design @ Liquid AI.
           </p>
-          <div className="flex gap-1 text-[15px] leading-[20px] tracking-[-0.06px]">
+          <div className="flex gap-1 text-[13px] md:text-[15px] leading-[18px] md:leading-[20px] tracking-[-0.026px] md:tracking-[-0.06px]">
             <span className="text-foreground">Previously @</span>
             <span className="text-foreground">Palantir.</span>
             <span className="text-foreground">Meta.</span>
@@ -42,11 +42,11 @@ export default function Hero() {
         </motion.div>
       </div>
       <motion.div
-        className="shrink-0"
+        className="shrink-0 self-end md:self-auto"
         {...fadeUp}
         transition={{ ...springTransition, delay: 0.2 }}
       >
-        <p className="w-[392px] text-[13px] leading-[18px] tracking-[-0.026px] text-foreground">
+        <p className="w-[280px] md:w-[392px] text-right md:text-left text-[12px] md:text-[13px] leading-[16px] md:leading-[18px] tracking-[-0.026px] text-foreground">
           A product designer specializing in complex, data-rich
           challenges—designing systems that push the frontier of what technology
           can enable.

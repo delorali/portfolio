@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import type { Project, CaseStudySection, CaseStudyMedia, ImageGroup } from "./ProjectCard";
 import { Badge } from "./ui/badge";
+import KumuTechStack from "./KumuTechStack";
 
 interface ProjectDetailProps {
   project: Project;
@@ -99,6 +100,30 @@ function MediaElement({
       </div>
     );
   }
+  if (media.fillWidth) {
+    const [w, h] = media.aspectRatio.split("/").map(Number);
+    return (
+      <div ref={innerRef} className="w-full" style={{ boxShadow: mdShadow }}>
+        <Image
+          src={media.src}
+          alt=""
+          width={w}
+          height={h}
+          className={`w-full h-auto pointer-events-none${media.darkSrc ? " dark:hidden" : ""}`}
+        />
+        {media.darkSrc && (
+          <Image
+            src={media.darkSrc}
+            alt=""
+            width={w}
+            height={h}
+            className="w-full h-auto pointer-events-none hidden dark:block"
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       ref={innerRef}
@@ -124,53 +149,75 @@ function ImageGroupBlock({
 }) {
   if (group.layout === "side-by-side") {
     const phoneCount = group.images.length;
-    return (
-      <div ref={innerRef} className="flex gap-3 w-full items-end">
-        <div className="flex flex-col gap-4 min-w-0 text-foreground" style={{ width: `calc(${((3 - phoneCount) / 3) * 100}% - ${(12 * phoneCount) / 3}px)` }}>
-          {group.title && (
-            <p className="text-[28px] font-semibold leading-[34px] tracking-[-0.4px]">
-              {group.title}
-            </p>
-          )}
-          {group.description && (
-            <p className="text-[15px] leading-[20px] tracking-[-0.06px]">
-              {group.description}
-            </p>
-          )}
-        </div>
-        {group.images.map((img, i) => (
-          <div
-            key={i}
-            className="relative rounded-[20px] border border-border overflow-hidden"
-            style={{ width: `calc(${100 / 3}% - ${(12 * (3 - 1)) / 3}px)`, aspectRatio: img.aspectRatio }}
-          >
-            {img.type === "video" ? (
-              <video
-                src={img.src}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-              />
-            ) : (
-              <Image
-                src={img.src}
-                alt=""
-                fill
-                className="object-cover pointer-events-none"
-              />
-            )}
-          </div>
-        ))}
+    const textBlock = (
+      <>
+        {group.title && (
+          <p className="text-[22px] md:text-[28px] font-semibold leading-[28px] md:leading-[34px] tracking-[-0.04em]">
+            {group.title}
+          </p>
+        )}
+        {group.description && (
+          <p className="text-[15px] leading-[20px] tracking-[-0.06px]">
+            {group.description}
+          </p>
+        )}
+      </>
+    );
+    const imageBlock = group.images.map((img, i) => (
+      <div
+        key={i}
+        className="relative rounded-[20px] border border-border overflow-hidden"
+        style={{ aspectRatio: img.aspectRatio }}
+      >
+        {img.type === "video" ? (
+          <video
+            src={img.src}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          />
+        ) : (
+          <Image
+            src={img.src}
+            alt=""
+            fill
+            className="object-cover pointer-events-none"
+          />
+        )}
       </div>
+    ));
+    return (
+      <>
+        {/* Mobile: stacked vertically */}
+        <div ref={innerRef} className="flex md:hidden flex-col gap-4 w-full">
+          <div className="flex flex-col gap-4 text-foreground">
+            {textBlock}
+          </div>
+          <div className="flex gap-3 w-full">
+            {imageBlock}
+          </div>
+        </div>
+        {/* Desktop: side by side */}
+        <div className="hidden md:flex gap-3 w-full items-end">
+          <div className="flex flex-col gap-4 min-w-0 text-foreground" style={{ width: `calc(${((3 - phoneCount) / 3) * 100}% - ${(12 * phoneCount) / 3}px)` }}>
+            {textBlock}
+          </div>
+          {imageBlock.map((el, i) => (
+            <div key={i} style={{ width: `calc(${100 / 3}% - ${(12 * 2) / 3}px)` }}>
+              {el}
+            </div>
+          ))}
+        </div>
+      </>
     );
   }
 
   return (
     <div ref={innerRef} className="flex flex-col gap-[24px] w-full">
       {group.title && (
-        <p className="text-[28px] font-semibold leading-[34px] tracking-[-0.4px] text-foreground">
+        <p className="text-[22px] md:text-[28px] font-semibold leading-[28px] md:leading-[34px] tracking-[-0.04em] text-foreground">
           {group.title}
         </p>
       )}
@@ -199,6 +246,7 @@ function ImageGroupBlock({
           {group.description}
         </p>
       )}
+      {group.customComponent === "kumu-tech-stack" && <KumuTechStack />}
       {group.images.length > 0 && (
         <div className={group.layout === "vertical" ? "flex flex-col gap-3 w-full" : "flex gap-3 w-full items-start"}>
           {group.images.map((img, i) => {
@@ -282,7 +330,7 @@ function CaseStudySectionBlock({
 
   return (
     <motion.div
-      className="flex gap-12 px-[240px] w-full"
+      className="flex gap-12 px-5 md:px-[80px] lg:px-[240px] w-full"
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
@@ -292,18 +340,20 @@ function CaseStudySectionBlock({
         delay: animationDelay,
       }}
     >
-      <SectionSidebar
-        title={section.sidebarTitle}
-        description={section.sidebarDescription}
-        sectionTitle={section.title}
-        items={section.sidebarItems}
-        activeIndex={activeIndex}
-      />
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[24px] items-start justify-center py-[72px]">
+      <div className="hidden md:block">
+        <SectionSidebar
+          title={section.sidebarTitle}
+          description={section.sidebarDescription}
+          sectionTitle={section.title}
+          items={section.sidebarItems}
+          activeIndex={activeIndex}
+        />
+      </div>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[24px] items-start justify-center py-[40px] md:py-[72px]">
         {(section.title || section.description) && (
           <div className="flex flex-col gap-4 w-full text-foreground">
             {section.title && (
-              <p className="text-[28px] font-semibold leading-[34px] tracking-[-0.4px]">
+              <p className="text-[22px] md:text-[28px] font-semibold leading-[28px] md:leading-[34px] tracking-[-0.04em]">
                 {section.title}
               </p>
             )}
@@ -344,7 +394,7 @@ function CaseStudySectionBlock({
           ))
         )}
         {section.imageGroups ? (
-          <div className={`flex flex-col gap-[64px] w-full${section.images.length > 0 ? " pt-[40px]" : ""}`}>
+          <div className={`flex flex-col gap-[96px] w-full${section.images.length > 0 ? " pt-[40px]" : ""}`}>
             {section.imageGroups.map((group, gi) => (
               <ImageGroupBlock
                 key={gi}
@@ -387,7 +437,7 @@ export default function ProjectDetail({
   if (!detail) {
     return (
       <motion.div
-        className="px-[240px] py-[50px]"
+        className="px-5 md:px-[80px] lg:px-[240px] py-[50px]"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.15 }}
@@ -401,8 +451,8 @@ export default function ProjectDetail({
 
   return (
     <div className="relative w-full">
-      {/* Back button — starts in-flow then sticks at header level */}
-      <div className="absolute left-[240px] top-[-349px] bottom-0 z-[60] pointer-events-none">
+      {/* Back button — starts in-flow then sticks at header level (desktop only, mobile uses Header) */}
+      <div className="hidden md:block absolute left-[80px] lg:left-[240px] top-[-349px] bottom-0 z-[60] pointer-events-none">
         <div className="sticky top-[16px] pointer-events-auto">
           <motion.button
             onClick={onClose}
@@ -418,7 +468,7 @@ export default function ProjectDetail({
 
       {/* Project info header */}
       <motion.div
-        className="relative flex flex-col gap-12 overflow-hidden px-[240px] py-[50px]"
+        className="relative flex flex-col gap-8 md:gap-12 overflow-hidden px-5 md:px-[80px] lg:px-[240px] py-[30px] md:py-[50px]"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
@@ -429,13 +479,16 @@ export default function ProjectDetail({
         }}
       >
         {/* Title + Tags + Duration row */}
-        <div className="flex items-start gap-16 w-full">
-          <div className="flex flex-1 flex-col gap-4">
-            <h2 className="text-[54px] font-semibold leading-[56px] tracking-[-0.594px] text-foreground">
+        <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-16 w-full">
+          <div className="flex flex-1 flex-col gap-3 md:gap-4">
+            <h2
+              className="text-[36px] md:text-[54px] font-semibold leading-[1.1] md:leading-[56px] tracking-[-0.04em] text-foreground"
+              style={project.id === "kumu" ? { fontFamily: "'Iowan Old Style', 'Georgia', serif", fontStyle: "italic", fontWeight: 400 } : undefined}
+            >
               {project.title}
             </h2>
             {project.tags && (
-              <div className="flex gap-1.5">
+              <div className="flex flex-wrap gap-1.5">
                 {project.tags.map((tag) => (
                   <Badge key={tag} variant="outline">
                     {tag}
