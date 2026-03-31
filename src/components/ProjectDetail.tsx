@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import type { Project, CaseStudySection, CaseStudyMedia, ImageGroup } from "./ProjectCard";
 import { Badge } from "./ui/badge";
 import KumuTechStack from "./KumuTechStack";
+import SkyBackground from "./SkyBackground";
 
 interface ProjectDetailProps {
   project: Project;
@@ -451,6 +452,11 @@ export default function ProjectDetail({
 
   return (
     <div className="relative w-full">
+      {/* Progressive-blur sky background */}
+      {project.skyBackground && (
+        <SkyBackground src={project.skyBackground} isDark={project.isDark} />
+      )}
+
       {/* Back button — starts in-flow then sticks at header level (desktop only, mobile uses Header) */}
       <div className="hidden md:block absolute left-[80px] lg:left-[240px] top-[-349px] bottom-0 z-[60] pointer-events-none">
         <div className="sticky top-[16px] pointer-events-auto">
