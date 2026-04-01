@@ -146,17 +146,17 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
       className="relative w-full"
       style={{ height: wrapperHeight }}
     >
-      <div className="sticky top-[calc(50vh-clamp(250px,27.5vw,394px))] px-5 md:px-[80px] lg:px-[120px]" style={{ height: "clamp(500px, 55vw, 788px)" }}>
+      <div className="sticky top-4 md:top-[calc(100vh-clamp(500px,55vw,788px))] px-3 md:px-[80px] lg:px-[120px]" style={{ height: "auto", minHeight: "0" }}>
       <div
-        className="flex w-full h-full rounded-[16px] overflow-hidden"
+        className="flex flex-col md:flex-row w-full md:h-[clamp(500px,55vw,788px)] rounded-[16px] overflow-hidden"
         style={{
           backgroundColor: t.cardBg,
           border: `1px solid ${t.cardBorder}`,
           boxShadow: t.cardShadow,
         }}
       >
-        {/* Left sidebar */}
-        <div className="hidden md:flex flex-col gap-5 shrink-0 w-[300px] lg:w-[354px] p-5 h-full">
+        {/* Info section — stacks on top on mobile, sidebar on desktop */}
+        <div className="flex flex-col gap-5 shrink-0 md:w-[300px] lg:w-[354px] p-3 md:p-5 md:h-full">
           <div className="flex flex-col gap-2 pb-4">
             <Image
               src="/projects/star-icon.svg"
@@ -166,7 +166,7 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
               className={t.starInvert ? "brightness-0 invert" : ""}
             />
             <p
-              className="text-[22px] lg:text-[26px] font-normal leading-[30px] lg:leading-[34px] tracking-[-1.04px]"
+              className="text-[24px] md:text-[22px] lg:text-[26px] font-normal leading-[24px] md:leading-[30px] lg:leading-[34px] tracking-[-0.96px] md:tracking-[-1.04px]"
               style={{ color: t.title }}
             >
               {card.title}
@@ -189,9 +189,9 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
               <p style={{ color: t.body }} className="tracking-[-0.013px]">{card.impact.text}</p>
             </div>
           )}
-          {/* Nav items pushed to bottom — hidden for single-item and multi-layout cards */}
+          {/* Nav items pushed to bottom — desktop only, hidden for single-item and multi-layout cards */}
           {totalItems > 1 && !isMultiLayout && (
-            <div className="flex flex-col mt-auto">
+            <div className="hidden md:flex flex-col mt-auto">
               {card.navItems.map((item, i) => (
                 <button
                   key={i}
@@ -209,8 +209,8 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
           )}
         </div>
 
-        {/* Right image area */}
-        <div className="flex-1 relative flex items-center justify-center overflow-hidden rounded-[12px] my-3 mr-3">
+        {/* Image area */}
+        <div className="relative flex items-center justify-center overflow-hidden rounded-[8px] md:rounded-[12px] h-[354px] md:h-auto md:flex-1 mx-3 mb-3 md:my-3 md:mr-3 md:ml-0">
           {/* Background layers — progressive blur: sharp at top (0px) → blurry at bottom (10px) */}
           {card.backgroundImage && (
             <>
@@ -257,8 +257,10 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
           )}
           {/* Main screenshot area */}
           {card.layout === "staggered" ? (
-            /* Staggered: center item raised, side items offset down */
-            <div className="absolute inset-0 z-10 flex items-center justify-center px-10 py-16">
+            <>
+            {/* Staggered: desktop — center raised, sides offset; mobile — trio layout */}
+            {/* Desktop staggered */}
+            <div className="absolute inset-0 z-10 hidden md:flex items-center justify-center px-10 py-16">
               <div className="relative w-full h-full max-w-[726px]">
                 {/* Center item — video or image */}
                 <div
@@ -314,14 +316,46 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
                 )}
               </div>
             </div>
-          ) : card.layout === "trio" ? (
-            /* Trio: three items side by side, equal height */
-            <div className="absolute inset-0 z-10 flex items-center justify-center px-10 py-16">
-              <div className="flex gap-2.5 h-full items-center justify-center" style={{ maxHeight: "530px" }}>
+            {/* Mobile staggered → trio */}
+            <div className="absolute inset-0 z-10 flex md:hidden items-center justify-center px-3 py-10">
+              <div className="flex gap-2 h-full items-center justify-center">
                 {card.navItems.map((item, i) => (
                   <div
                     key={i}
-                    className="relative rounded-[16px] overflow-hidden border shrink-0"
+                    className="relative rounded-[12px] overflow-hidden border shrink-0"
+                    style={{
+                      aspectRatio: "1320/2868",
+                      height: "100%",
+                      borderColor: t.cardBorder,
+                      boxShadow: "0px 2px 6px rgba(0,0,0,0.04), 0px 4px 12px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.03)",
+                    }}
+                  >
+                    {item.video ? (
+                      <video
+                        ref={videoRef}
+                        src={item.video}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+                    ) : item.image ? (
+                      <Image src={item.image} alt="" fill className="object-cover" />
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+            </>
+          ) : card.layout === "trio" ? (
+            /* Trio: three items side by side, equal height */
+            <div className="absolute inset-0 z-10 flex items-center justify-center px-3 md:px-10 py-10 md:py-16">
+              <div className="flex gap-2 md:gap-2.5 h-full items-center justify-center" style={{ maxHeight: "530px" }}>
+                {card.navItems.map((item, i) => (
+                  <div
+                    key={i}
+                    className="relative rounded-[12px] md:rounded-[16px] overflow-hidden border shrink-0"
                     style={{
                       aspectRatio: "1320/2868",
                       height: "100%",
@@ -408,56 +442,17 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
             />
           </div>
         </div>
-      </div>
-      </div>
-    </div>
 
-    {/* Mobile: info below card (outside scroll wrapper) */}
-    <div className="flex md:hidden flex-col gap-5 mt-6 px-6">
-      <div className="flex flex-col gap-2">
-        <Image
-          src="/projects/star-icon.svg"
-          alt=""
-          width={24}
-          height={24}
-          className={t.starInvert ? "brightness-0 invert" : ""}
-        />
-        <p
-          className="text-[20px] font-normal leading-[26px] tracking-[-0.8px]"
-          style={{ color: t.title }}
-        >
-          {card.title}
-        </p>
+        {/* Mobile caption — shows active item label below image */}
+        {totalItems > 1 && !isMultiLayout && (
+          <div className="flex md:hidden px-3 pb-3">
+            <p className="text-[13px] leading-[18px] tracking-[-0.013px]" style={{ color: t.body }}>
+              {card.navItems[activeIndex]?.label}
+            </p>
+          </div>
+        )}
       </div>
-      {card.overview && (
-        <div className="flex flex-col gap-3 text-[13px] leading-[18px]">
-          <p style={{ color: t.label }} className="tracking-[-0.026px]">{card.overview.label}</p>
-          <p style={{ color: t.body }} className="tracking-[-0.013px]">{card.overview.text}</p>
-        </div>
-      )}
-      {card.impact && (
-        <div className="flex flex-col gap-3 text-[13px] leading-[18px]">
-          <p style={{ color: t.label }} className="tracking-[-0.026px]">{card.impact.label}</p>
-          <p style={{ color: t.body }} className="tracking-[-0.013px]">{card.impact.text}</p>
-        </div>
-      )}
-      {totalItems > 1 && (
-        <div className="flex flex-col">
-          {card.navItems.map((item, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveIndex(i)}
-              className="flex items-center px-4 py-2 border-l text-left transition-colors"
-              style={{
-                borderColor: i === activeIndex ? t.navBorderActive : t.navBorderInactive,
-                color: i === activeIndex ? t.navActive : t.navInactive,
-              }}
-            >
-              <p className="text-[14px] leading-[19px] tracking-[-0.042px]">{item.label}</p>
-            </button>
-          ))}
-        </div>
-      )}
+      </div>
     </div>
     </>
   );
@@ -844,7 +839,7 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
   return (
     <div className="relative w-full">
       {/* Back button — starts aligned with project card, sticks to top on scroll */}
-      <div className="hidden md:flex sticky top-[-4px] z-[60] px-[80px] lg:px-[120px] pb-0 pointer-events-none" style={{ marginTop: "-349px", marginBottom: `${349 - 48}px` }}>
+      <div className="hidden md:flex sticky top-[16px] z-[60] px-[80px] lg:px-[120px] pb-0 pointer-events-none" style={{ marginTop: "-349px", marginBottom: `${349 - 48}px` }}>
         <motion.button
           onClick={onClose}
           className="flex size-[48px] items-center justify-center rounded-full shadow-sm transition-colors hover:bg-[#e4e4e7] pointer-events-auto"
@@ -863,7 +858,7 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
       <>
       {/* Project info content */}
       <motion.div
-        className="relative flex flex-col gap-12 px-5 md:px-[80px] lg:px-[120px] py-[50px]"
+        className="relative flex flex-col gap-8 md:gap-12 px-3 md:px-[80px] lg:px-[120px] py-[20px] md:py-[50px]"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.15 }}
@@ -872,7 +867,7 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
         <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-16 w-full">
           <div className="flex flex-1 flex-col gap-3">
             <h2
-              className="text-[36px] md:text-[54px] font-normal leading-[1.1] md:leading-[56px] tracking-[-0.03em]"
+              className="text-[34px] md:text-[54px] font-normal leading-[1.1] md:leading-[56px] tracking-[-0.03em]"
               style={{
                 fontFamily: project.id === "kumu"
                   ? "'Iowan Old Style', 'Georgia', serif"
@@ -912,7 +907,7 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
               <p className="text-[13px] leading-[18px] tracking-[-0.026px] uppercase font-mono" style={{ color: t.muted }}>
                 Duration
               </p>
-              <p className="text-[15px] leading-[20px] tracking-[-0.06px]" style={{ color: t.foreground }}>
+              <p className="text-[13px] md:text-[15px] leading-[18px] md:leading-[20px] tracking-[-0.026px] md:tracking-[-0.06px]" style={{ color: t.foreground }}>
                 {detail.duration}
               </p>
             </div>
@@ -925,11 +920,11 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
             <p className="text-[13px] leading-[18px] tracking-[-0.026px] uppercase font-mono" style={{ color: t.muted }}>
               Context
             </p>
-            <p className="text-[17px] font-semibold leading-[22px] tracking-[-0.068px]" style={{ color: t.foreground }}>
+            <p className="text-[15px] md:text-[17px] font-semibold md:font-semibold leading-[20px] md:leading-[22px] tracking-[-0.06px] md:tracking-[-0.068px]" style={{ color: t.foreground }}>
               {detail.contextHeadline}
             </p>
             {detail.context?.map((text, i) => (
-              <p key={i} className="text-[15px] leading-[20px] tracking-[-0.06px]" style={{ color: t.foreground }}>
+              <p key={i} className="text-[13px] md:text-[15px] leading-[18px] md:leading-[20px] tracking-[-0.013px] md:tracking-[-0.06px]" style={{ color: t.foreground }}>
                 {text}
               </p>
             ))}
@@ -942,7 +937,7 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
             <p className="text-[13px] leading-[18px] tracking-[-0.026px] uppercase font-mono" style={{ color: t.muted }}>
               My Role
             </p>
-            <p className="text-[15px] leading-[20px] tracking-[-0.06px]" style={{ color: t.foreground }}>
+            <p className="text-[13px] md:text-[15px] leading-[18px] md:leading-[20px] tracking-[-0.013px] md:tracking-[-0.06px]" style={{ color: t.foreground }}>
               {detail.role}
             </p>
           </div>
@@ -952,7 +947,7 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
       {/* Hero screens — static phone mockups shown before showcase cards */}
       {heroScreens.length > 0 && (
         <motion.div
-          className="flex justify-center gap-6 px-5 md:px-[120px] pb-8"
+          className="flex justify-center gap-6 px-3 md:px-[120px] pb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.25 }}
@@ -960,7 +955,7 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
           {heroScreens.map((src, i) => (
             <div
               key={i}
-              className="relative rounded-[24px] overflow-hidden border"
+              className={`relative rounded-[24px] overflow-hidden border ${i > 0 ? "hidden md:block" : ""}`}
               style={{
                 aspectRatio: "1320/2868",
                 height: "637px",
@@ -979,7 +974,7 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
         {showcaseCards.map((card, i) => (
           <div key={i} className="flex flex-col gap-5">
             {card.sectionHeader && (
-              <div className="px-5 md:px-[80px] lg:px-[120px]">
+              <div className="px-3 md:px-[80px] lg:px-[120px]">
                 <p className="text-[13px] leading-[18px] tracking-[-0.026px] uppercase font-mono" style={{ color: t.muted }}>
                   {card.sectionHeader}
                 </p>
@@ -992,7 +987,7 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
 
       {/* Process sections */}
       {processSections.length > 0 && (
-        <div className="flex flex-col gap-5 px-5 md:px-[80px] lg:px-[120px] py-6 mt-16">
+        <div className="flex flex-col gap-5 px-3 md:px-[80px] lg:px-[120px] py-6 mt-16">
           <p className="text-[13px] leading-[18px] tracking-[-0.026px] uppercase font-mono" style={{ color: t.muted }}>
             The process
           </p>

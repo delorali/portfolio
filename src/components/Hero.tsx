@@ -43,7 +43,8 @@ export default function Hero() {
           transition={{ ...springTransition, delay: 0.1 }}
         >
           <p className="text-[15px] md:text-[17px] md:font-medium leading-[20px] md:leading-[22px] tracking-[-0.06px] md:tracking-[-0.068px] text-foreground">
-            Currently leading design @ Liquid AI.
+            <span className="md:hidden">Leading design @ Liquid AI.</span>
+            <span className="hidden md:inline">Currently leading design @ Liquid AI.</span>
           </p>
           <div className="flex gap-1 text-[13px] md:text-[15px] leading-[18px] md:leading-[20px] tracking-[-0.026px] md:tracking-[-0.06px]">
             <span className="text-foreground">Previously @</span>
@@ -55,11 +56,11 @@ export default function Hero() {
         </motion.div>
       </div>
       <motion.div
-        className="shrink-0 self-end md:self-auto"
+        className="hidden md:block shrink-0 self-end md:self-auto"
         {...fadeUp}
         transition={{ ...springTransition, delay: 0.2 }}
       >
-        <p className="w-[280px] md:w-[392px] text-right md:text-left text-[12px] md:text-[13px] leading-[16px] md:leading-[18px] tracking-[-0.026px] text-foreground">
+        <p className="w-[392px] text-left text-[13px] leading-[18px] tracking-[-0.026px] text-foreground">
           A product designer specializing in complex, data-rich
           challenges—designing systems that push the frontier of what technology
           can enable.

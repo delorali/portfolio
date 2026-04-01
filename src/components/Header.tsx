@@ -44,7 +44,7 @@ export default function Header({ isProjectOpen, isDarkProject, onBack }: HeaderP
           }`}
         >
           Resume
-          <ArrowUpRight className="size-4" />
+          <ArrowUpRight className="hidden md:block size-4" />
         </a>
       </div>
     </header>
