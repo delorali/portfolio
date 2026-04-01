@@ -6,7 +6,9 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import type { Project } from "./ProjectCard";
 import { Badge } from "./ui/badge";
+import PasswordGate, { isProjectUnlocked } from "./PasswordGate";
 
+const PASSWORD_PROTECTED_PROJECTS = ["gotham", "baba"];
 
 interface ProjectDetailV2Props {
   project: Project;
@@ -23,6 +25,7 @@ interface ShowcaseCard {
   backgroundImage?: string;
   skyOverlay?: { src: string; blur: number };
   imageAspectRatio?: string;
+  layout?: "staggered" | "trio";
 }
 
 interface ProcessSection {
@@ -30,8 +33,10 @@ interface ProcessSection {
   italicSubtitle?: string;
   description?: string;
   bullets?: string[];
-  image: string;
-  aspectRatio: string;
+  image?: string;
+  aspectRatio?: string;
+  images?: { src: string; aspectRatio: string; rounded?: boolean }[];
+  imagesLayout?: "side-by-side" | "stacked";
 }
 
 // Theme colors based on dark/light mode
@@ -75,8 +80,10 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
   const [videoProgress, setVideoProgress] = useState(0);
   const [videoTime, setVideoTime] = useState({ current: 0, duration: 0 });
   const totalItems = card.navItems.length;
+  const hasVideo = card.navItems.some(item => !!item.video);
   const isVideoCard = totalItems === 1 && !!card.navItems[0]?.video;
-  const progressFraction = isVideoCard ? videoProgress : (activeIndex + 1) / totalItems;
+  const isMultiLayout = card.layout === "staggered" || card.layout === "trio";
+  const progressFraction = (isVideoCard || (isMultiLayout && hasVideo)) ? videoProgress : (activeIndex + 1) / totalItems;
   const t = useTheme(isDark);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -84,7 +91,7 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
 
   // Video progress tracking — use RAF for smooth updates
   useEffect(() => {
-    if (!isVideoCard) return;
+    if (!isVideoCard && !(isMultiLayout && hasVideo)) return;
     let rafId: number;
 
     const tick = () => {
@@ -98,11 +105,11 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
 
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [isVideoCard]);
+  }, [isVideoCard, isMultiLayout, hasVideo]);
 
   // Scroll-driven: track scroll position within the tall wrapper to determine active slide
   useEffect(() => {
-    if (isVideoCard) return; // No scroll-driven nav for single-video cards
+    if (isVideoCard || isMultiLayout) return; // No scroll-driven nav for video or multi-layout cards
     const handleScroll = () => {
       const wrapper = wrapperRef.current;
       if (!wrapper) return;
@@ -129,8 +136,8 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
     return () => window.removeEventListener("scroll", handleScroll);
   }, [totalItems, isVideoCard]);
 
-  // Tall wrapper: 100vh for video cards, 100vh + scroll distance for multi-item cards
-  const wrapperHeight = isVideoCard ? "100vh" : `calc(100vh + ${totalItems * 80}vh)`;
+  // Tall wrapper: 100vh for video/multi-layout cards, 100vh + scroll distance for multi-item cards
+  const wrapperHeight = (isVideoCard || isMultiLayout) ? "100vh" : `calc(100vh + ${totalItems * 80}vh)`;
 
   return (
     <>
@@ -182,8 +189,8 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
               <p style={{ color: t.body }} className="tracking-[-0.013px]">{card.impact.text}</p>
             </div>
           )}
-          {/* Nav items pushed to bottom — hidden for single-item cards */}
-          {totalItems > 1 && (
+          {/* Nav items pushed to bottom — hidden for single-item and multi-layout cards */}
+          {totalItems > 1 && !isMultiLayout && (
             <div className="flex flex-col mt-auto">
               {card.navItems.map((item, i) => (
                 <button
@@ -248,50 +255,143 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
               />
             </>
           )}
-          {/* Main screenshot — crossfade between images */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center p-10">
-            <div
-              className="relative"
-              style={{
-                aspectRatio: card.imageAspectRatio || "3360/2100",
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              {card.navItems.map((item, i) => (
-                <motion.div
-                  key={i}
-                  className={item.video ? "absolute inset-0 flex items-center justify-center" : "absolute inset-0"}
-                  initial={false}
-                  animate={{ opacity: i === activeIndex ? 1 : 0 }}
-                  transition={{ duration: 0.4, ease: "easeInOut" }}
+          {/* Main screenshot area */}
+          {card.layout === "staggered" ? (
+            /* Staggered: center item raised, side items offset down */
+            <div className="absolute inset-0 z-10 flex items-center justify-center px-10 py-16">
+              <div className="relative w-full h-full max-w-[726px]">
+                {/* Center item — video or image */}
+                <div
+                  className="absolute left-1/2 -translate-x-1/2 top-0 rounded-[16px] overflow-hidden border"
+                  style={{
+                    width: "234px",
+                    height: "508px",
+                    borderColor: t.cardBorder,
+                    boxShadow: "0px 2px 6px rgba(0,0,0,0.04), 0px 4px 12px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.03)",
+                  }}
                 >
-                  {item.video ? (
+                  {card.navItems[0]?.video ? (
                     <video
                       ref={videoRef}
-                      src={item.video}
+                      src={card.navItems[0].video}
                       autoPlay
                       loop
                       muted
                       playsInline
-                      className="max-w-full max-h-full"
-                      style={{ borderRadius: "16px", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.4)" }}
+                      className="w-full h-full object-cover"
                     />
-                  ) : item.image ? (
-                    <Image src={item.image} alt={item.label} fill className="object-contain" />
+                  ) : card.navItems[0]?.image ? (
+                    <Image src={card.navItems[0].image} alt="" fill className="object-cover" />
                   ) : null}
-                </motion.div>
-              ))}
+                </div>
+                {/* Left item */}
+                {card.navItems[1] && (
+                  <div
+                    className="absolute left-0 top-[83px] rounded-[16px] overflow-hidden border"
+                    style={{
+                      width: "234px",
+                      height: "508px",
+                      borderColor: t.cardBorder,
+                      boxShadow: "0px 2px 6px rgba(0,0,0,0.04), 0px 4px 12px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.03)",
+                    }}
+                  >
+                    <Image src={card.navItems[1].image!} alt="" fill className="object-cover" />
+                  </div>
+                )}
+                {/* Right item */}
+                {card.navItems[2] && (
+                  <div
+                    className="absolute right-0 top-[83px] rounded-[16px] overflow-hidden border"
+                    style={{
+                      width: "234px",
+                      height: "508px",
+                      borderColor: t.cardBorder,
+                      boxShadow: "0px 2px 6px rgba(0,0,0,0.04), 0px 4px 12px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.03)",
+                    }}
+                  >
+                    <Image src={card.navItems[2].image!} alt="" fill className="object-cover" />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          ) : card.layout === "trio" ? (
+            /* Trio: three items side by side, equal height */
+            <div className="absolute inset-0 z-10 flex items-center justify-center px-10 py-16">
+              <div className="flex gap-2.5 h-full items-center justify-center" style={{ maxHeight: "530px" }}>
+                {card.navItems.map((item, i) => (
+                  <div
+                    key={i}
+                    className="relative rounded-[16px] overflow-hidden border shrink-0"
+                    style={{
+                      aspectRatio: "1320/2868",
+                      height: "100%",
+                      borderColor: t.cardBorder,
+                      boxShadow: "0px 2px 6px rgba(0,0,0,0.04), 0px 4px 12px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.03)",
+                    }}
+                  >
+                    {item.video ? (
+                      <video
+                        ref={videoRef}
+                        src={item.video}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+                    ) : item.image ? (
+                      <Image src={item.image} alt="" fill className="object-cover" />
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Default: crossfade between images */
+            <div className="absolute inset-0 z-10 flex items-center justify-center p-10">
+              <div
+                className="relative"
+                style={{
+                  aspectRatio: card.imageAspectRatio || "3360/2100",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                {card.navItems.map((item, i) => (
+                  <motion.div
+                    key={i}
+                    className={item.video ? "absolute inset-0 flex items-center justify-center" : "absolute inset-0"}
+                    initial={false}
+                    animate={{ opacity: i === activeIndex ? 1 : 0 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                  >
+                    {item.video ? (
+                      <video
+                        ref={videoRef}
+                        src={item.video}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="max-w-full max-h-full"
+                        style={{ borderRadius: "16px", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.4)" }}
+                      />
+                    ) : item.image ? (
+                      <Image src={item.image} alt={item.label} fill className="object-contain" />
+                    ) : null}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
           {/* Counter tag — timestamp for video, N OF M for multi-image */}
-          {(isVideoCard || totalItems > 1) && (
+          {(isVideoCard || (isMultiLayout && hasVideo) || (!isMultiLayout && totalItems > 1)) && (
             <div
               className="absolute top-4 right-4 z-20 flex items-center gap-1.5 rounded-full backdrop-blur-sm px-3 py-1.5"
               style={{ backgroundColor: t.counterBg }}
             >
               <span className="text-[12px] font-medium leading-none tracking-[0.08em] text-white/90 font-mono">
-                {isVideoCard
+                {(isVideoCard || (isMultiLayout && hasVideo))
                   ? `${formatTime(videoTime.current)} / ${formatTime(videoTime.duration)}`
                   : `${activeIndex + 1} OF ${totalItems}`}
               </span>
@@ -304,7 +404,7 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
               style={{ backgroundColor: t.progressBar }}
               initial={false}
               animate={{ width: `${progressFraction * 100}%` }}
-              transition={isVideoCard ? { duration: 0.3, ease: "linear" } : { type: "spring", stiffness: 300, damping: 30 }}
+              transition={(isVideoCard || (isMultiLayout && hasVideo)) ? { duration: 0.3, ease: "linear" } : { type: "spring", stiffness: 300, damping: 30 }}
             />
           </div>
         </div>
@@ -482,6 +582,75 @@ function getShowcaseCards(projectId: string): ShowcaseCard[] {
     },
   ];
 
+  if (projectId === "kickback") return [
+    {
+      sectionHeader: "Some of my projects",
+      title: "Real-time photo sharing.",
+      subtitle: "Each Kickback is a shared moment:",
+      overview: {
+        label: "",
+        text: "One friend starts the day with a photo and optional prompt. Everyone in the group responds within a set window. Photos unlock as friends post, creating a sense of presence and participation.",
+      },
+      navItems: [
+        { label: "Photo feed", image: "/projects/kickback-photo-1.png" },
+        { label: "Partake in Kickback", video: "/projects/Kickback videos/kickback-partake.mov" },
+        { label: "Photo detail", image: "/projects/kickback-photo-2.png" },
+      ],
+      backgroundImage: "/projects/kickback-bg-1.png",
+      imageAspectRatio: "860/1864",
+      layout: "trio" as const,
+    },
+    {
+      title: "A mosaic of memories.",
+      subtitle: "Daily Kick Backs are saved into your Group Memories become a visual thread of friendship\u2014authentic, casual, and uniquely yours.",
+      navItems: [
+        { label: "Memories grid", image: "/projects/kickback-memories-1.png" },
+        { label: "Memories scroll", video: "/projects/Kickback videos/kickback-memories.mov" },
+        { label: "Memory detail", image: "/projects/kickback-memories-2.png" },
+      ],
+      backgroundImage: "/projects/kickback-bg-2.png",
+      imageAspectRatio: "860/1864",
+      layout: "trio" as const,
+    },
+    {
+      title: "Creating a new Kick Back group.",
+      subtitle: "Groups can be made from new Kick Back posts, sending notifications to each friend that they\u2019ve been invited to a Kick Back with their new group.",
+      navItems: [
+        { label: "Create group", video: "/projects/Kickback videos/kickback-create-group.mov" },
+      ],
+      backgroundImage: "/projects/kickback-bg-3.png",
+      imageAspectRatio: "860/1864",
+    },
+  ];
+
+  if (projectId === "kumu") return [
+    {
+      sectionHeader: "The solution",
+      title: "Card deck generation from raw study notes.",
+      subtitle: "By uploading raw study notes, users can create card decks, which they can study and quiz against.",
+      navItems: [
+        { label: "Generating a card deck", video: "/projects/kumu media/Generating a card deck.mp4" },
+        { label: "Card", image: "/projects/kumu media/Card.png" },
+        { label: "Card list", image: "/projects/kumu media/Card list.png" },
+      ],
+      backgroundImage: "/projects/foundry-cloud-1.png",
+      imageAspectRatio: "1320/2868",
+      layout: "staggered" as const,
+    },
+    {
+      title: "Quiz on your flash cards, and receive personalized coaching feedback.",
+      subtitle: "With Kumu\u2019s AI coach, receive tailored feedback on each of your answers, whether right or wrong.",
+      navItems: [
+        { label: "Correct answer", image: "/projects/kumu media/Correct.png" },
+        { label: "Quiz taking", video: "/projects/kumu media/Quiz taking.mp4" },
+        { label: "Quiz complete", image: "/projects/kumu media/Quix complete.png" },
+      ],
+      backgroundImage: "/projects/foundry-cloud-1.png",
+      imageAspectRatio: "1320/2868",
+      layout: "trio" as const,
+    },
+  ];
+
   if (projectId === "baba") return [
     {
       sectionHeader: "The solution",
@@ -545,6 +714,77 @@ function getShowcaseCards(projectId: string): ShowcaseCard[] {
 }
 
 function getProcessSections(projectId: string): ProcessSection[] {
+  if (projectId === "kickback") return [
+    {
+      title: "Tech stack",
+      description: "The breakdown of technologies for not only design, front-end, and back-end, but also the AI stack for training and deploying LFMs.",
+      image: "/projects/kickback-tech-stack.png",
+      aspectRatio: "826/521",
+    },
+    {
+      title: "User flows and wireframes",
+      description: "Diagrams and low-fidelity explorations of the core flow — creating a hangout, inviting friends, and the real-time coordination experience.",
+      images: [
+        { src: "/projects/kickback-userflow.png", aspectRatio: "854/583" },
+        { src: "/projects/kickback-wireframes.png", aspectRatio: "830/1089" },
+      ],
+      imagesLayout: "stacked" as const,
+    },
+    {
+      title: "Iteration",
+      description: "Iteration was a process involving both Claude Code and Figma, generating simple proof of concepts for interactions in Code before porting them into Figma for polish and design.",
+      images: [
+        { src: "/projects/kickback-lofi-new.png", aspectRatio: "877/449" },
+        { src: "/projects/kickback-midfi-new.png", aspectRatio: "1000/1752" },
+      ],
+      imagesLayout: "stacked" as const,
+    },
+    {
+      title: "Visual design library",
+      description: "In the process of developing a visual design library and language, we were able to create polished high-fidelity screens, incorporating all learnings from research and iteration phases.",
+      images: [
+        { src: "/projects/kickback-visual-1.png", aspectRatio: "2118/1368" },
+        { src: "/projects/kickback-visual-2.png", aspectRatio: "3870/4096" },
+      ],
+      imagesLayout: "stacked" as const,
+    },
+  ];
+
+  if (projectId === "kumu") return [
+    {
+      title: "Tech stack",
+      description: "The breakdown of technologies for not only design, front-end, and back-end, but also the AI stack for training and deploying LFMs.",
+      image: "/projects/kumu-tech-stack.png",
+      aspectRatio: "2308/1028",
+    },
+    {
+      title: "Fine tuning LFMs",
+      description: "To train Liquid\u2019s Foundational Models to be able to complete the tasks I had in mind, I created training datasets for both Card Generation and Coaching, which were used to train and evaluate the models.",
+      image: "/projects/kumu-fine-tuning.png",
+      aspectRatio: "2366/596",
+    },
+    {
+      title: "Iteration",
+      description: "Iteration was a process involving both Claude Code and Figma, generating simple proof of concepts for interactions in Code before porting them into Figma for polish and design. This, while a simple task, was really interesting to conduct, as it flipped the standard enterprise design process on its head, having code be the base that design worked off of.",
+      images: [
+        { src: "/projects/kumu-iteration-code.png", aspectRatio: "292/627", rounded: true },
+        { src: "/projects/kumu-iteration-midfi.png", aspectRatio: "1313/2862", rounded: true },
+        { src: "/projects/kumu media/Home.png", aspectRatio: "1320/2868", rounded: true },
+      ],
+      imagesLayout: "side-by-side" as const,
+    },
+    {
+      title: "Components and design",
+      description: "The design portion of the project was relatively light, where I identified key components and key frames to be designed, and worked in both Figma and Claude Code to bring them to light.",
+      images: [
+        { src: "/projects/kumu-components-1.png", aspectRatio: "697/440" },
+        { src: "/projects/kumu-components-2.png", aspectRatio: "2504/1998" },
+        { src: "/projects/kumu-components-3.png", aspectRatio: "3336/1710" },
+      ],
+      imagesLayout: "stacked" as const,
+    },
+  ];
+
   if (projectId === "baba") return [
     {
       title: "Decomposition: Stages of Patient onboarding",
@@ -575,12 +815,26 @@ function getProcessSections(projectId: string): ProcessSection[] {
   return [];
 }
 
+function getHeroScreens(projectId: string): string[] {
+  if (projectId === "kumu") return [
+    "/projects/kumu media/Home.png",
+    "/projects/kumu media/All decks.png",
+    "/projects/kumu media/Profile.png",
+  ];
+  return [];
+}
+
 export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Props) {
   const detail = project.detail;
   const isDark = project.isDark;
   const t = useTheme(isDark);
   const showcaseCards = getShowcaseCards(project.id);
+  const heroScreens = getHeroScreens(project.id);
   const processSections = getProcessSections(project.id);
+  const [isLocked, setIsLocked] = useState(
+    PASSWORD_PROTECTED_PROJECTS.includes(project.id) &&
+      !isProjectUnlocked(project.id)
+  );
 
   // Title with italic second word
   const titleParts = project.title.split(" ");
@@ -589,11 +843,11 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
 
   return (
     <div className="relative w-full">
-      {/* Back button — sticks at top on scroll */}
-      <div className="hidden md:block fixed left-[80px] lg:left-[120px] top-[16px] z-[60]">
+      {/* Back button — starts aligned with project card, sticks to top on scroll */}
+      <div className="hidden md:flex sticky top-[-4px] z-[60] px-[80px] lg:px-[120px] pb-0 pointer-events-none" style={{ marginTop: "-349px", marginBottom: `${349 - 48}px` }}>
         <motion.button
           onClick={onClose}
-          className="flex size-[48px] items-center justify-center rounded-full shadow-sm transition-colors hover:bg-[#e4e4e7]"
+          className="flex size-[48px] items-center justify-center rounded-full shadow-sm transition-colors hover:bg-[#e4e4e7] pointer-events-auto"
           style={{ backgroundColor: t.backBtnBg }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -603,6 +857,10 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
         </motion.button>
       </div>
 
+      {isLocked ? (
+        <PasswordGate projectId={project.id} isDark={isDark} onUnlock={() => setIsLocked(false)} />
+      ) : (
+      <>
       {/* Project info content */}
       <motion.div
         className="relative flex flex-col gap-12 px-5 md:px-[80px] lg:px-[120px] py-[50px]"
@@ -615,7 +873,14 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
           <div className="flex flex-1 flex-col gap-3">
             <h2
               className="text-[36px] md:text-[54px] font-normal leading-[1.1] md:leading-[56px] tracking-[-0.03em]"
-              style={{ fontFamily: "'Times New Roman', Times, serif", color: t.foreground }}
+              style={{
+                fontFamily: project.id === "kumu"
+                  ? "'Iowan Old Style', 'Georgia', serif"
+                  : "'Times New Roman', Times, serif",
+                fontStyle: project.id === "kumu" ? "italic" : undefined,
+                fontWeight: project.id === "kumu" ? 700 : undefined,
+                color: t.foreground,
+              }}
             >
               {titleParts.length > 1 ? (
                 <>
@@ -684,6 +949,31 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
         )}
       </motion.div>
 
+      {/* Hero screens — static phone mockups shown before showcase cards */}
+      {heroScreens.length > 0 && (
+        <motion.div
+          className="flex justify-center gap-6 px-5 md:px-[120px] pb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.25 }}
+        >
+          {heroScreens.map((src, i) => (
+            <div
+              key={i}
+              className="relative rounded-[24px] overflow-hidden border"
+              style={{
+                aspectRatio: "1320/2868",
+                height: "637px",
+                borderColor: t.cardBorder,
+                boxShadow: "0px 2px 6px rgba(0,0,0,0.04), 0px 4px 12px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.03)",
+              }}
+            >
+              <Image src={src} alt="" fill className="object-cover" />
+            </div>
+          ))}
+        </motion.div>
+      )}
+
       {/* Showcase cards — full-width scroll zones with optional section headers */}
       <div className="flex flex-col gap-16">
         {showcaseCards.map((card, i) => (
@@ -743,9 +1033,42 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
                     </ul>
                   )}
                 </div>
-                <div className="relative w-full rounded-[6px] overflow-hidden" style={{ aspectRatio: section.aspectRatio }}>
-                  <Image src={section.image} alt={section.title} fill className="object-cover" />
-                </div>
+                {/* Single image */}
+                {section.image && section.aspectRatio && (
+                  <div className="relative rounded-[6px] overflow-hidden lg:w-[70vw]" style={{ aspectRatio: section.aspectRatio }}>
+                    <Image src={section.image} alt={section.title} fill className="object-cover" />
+                  </div>
+                )}
+                {/* Multiple images — side-by-side or stacked */}
+                {section.images && section.imagesLayout === "side-by-side" && (
+                  <div className="flex gap-3 justify-center lg:w-[70vw]">
+                    {section.images.map((img, j) => (
+                      <div
+                        key={j}
+                        className={`relative flex-1 overflow-hidden ${img.rounded ? "rounded-[24px] border shadow-md" : ""}`}
+                        style={{
+                          aspectRatio: img.aspectRatio,
+                          borderColor: img.rounded ? t.cardBorder : undefined,
+                        }}
+                      >
+                        <Image src={img.src} alt="" fill className="object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {section.images && section.imagesLayout === "stacked" && (
+                  <div className="flex flex-col gap-10 lg:w-[70vw]">
+                    {section.images.map((img, j) => (
+                      <div
+                        key={j}
+                        className="relative w-full overflow-hidden"
+                        style={{ aspectRatio: img.aspectRatio }}
+                      >
+                        <Image src={img.src} alt="" fill className="object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -754,6 +1077,8 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
 
       {/* Bottom spacing */}
       <div className="h-16" />
+      </>
+      )}
     </div>
   );
 }

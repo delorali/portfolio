@@ -30,7 +30,7 @@ function useIsMobile() {
   return isMobile;
 }
 
-const DARK_PROJECTS = ["gotham"];
+const DARK_PROJECTS = ["gotham", "kickback"];
 
 const blurLayers = [
   { blur: 3, fadeStart: "30%", fadeEnd: "50%" },

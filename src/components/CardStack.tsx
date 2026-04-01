@@ -344,7 +344,7 @@ const projects: Project[] = [
     hoverDescription:
       "A mobile app that transforms raw study notes into personalized AI-generated flashcard decks and delivers an intelligent coaching experience.",
     backgroundImage: "/projects/kumu-card-bg.png",
-    skyBackground: "/projects/kumu-card-bg.png",
+    skyBackground: "/projects/baba-sky-bg.png",
     logo: (
       <div className="flex items-center gap-3">
         <div className="relative h-[24px] w-[22px]">
@@ -481,8 +481,9 @@ const projects: Project[] = [
     centerImage: "/projects/kickback-phone-mockup.png",
     centerImageSize: { width: 230, height: 470 },
     centerImageOffset: { y: 127 },
+    skyBackground: "/projects/kickback-sky-bg.png",
     detail: {
-      duration: "February 2026 • 2 weeks",
+      duration: "Sept 2024 • 4 weeks",
       role: "As the product designer, I worked a small team of 3 other developers to create the product narrative, before designing the high fidelity end-to-end workflows and design systems. Responsibilities included product strategy, interaction design, and visual design.",
       contextHeadline:
         "Kickback, the \u201CBeReal for friend groups\u201D: a social platform where friends can effortlessly plan hangouts — eliminating the endless group chat coordination and making spontaneous meetups the norm, not the exception.",
@@ -692,7 +693,7 @@ export default function CardStack({ onExpandChange, closeRef }: CardStackProps) 
     setSelectedIndex(null);
     setHoveredIndex(null);
     onExpandChange?.(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, [onExpandChange]);
 
   useEffect(() => {
@@ -842,7 +843,7 @@ export default function CardStack({ onExpandChange, closeRef }: CardStackProps) 
             transition={{ ...expandTransition, delay: 0.35 }}
             className="w-full"
           >
-            {projects[selectedIndex].id === "gotham" || projects[selectedIndex].id === "foundry" || projects[selectedIndex].id === "baba" ? (
+            {projects[selectedIndex].id === "gotham" || projects[selectedIndex].id === "foundry" || projects[selectedIndex].id === "baba" || projects[selectedIndex].id === "kumu" || projects[selectedIndex].id === "kickback" ? (
               <ProjectDetailV2
                 project={projects[selectedIndex]}
                 onClose={handleClose}
