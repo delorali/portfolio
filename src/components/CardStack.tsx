@@ -666,11 +666,10 @@ export default function CardStack({ onExpandChange, closeRef }: CardStackProps) 
         return index * stackOff;
       }
       // Hovered card + cards below: shift down so hovered card is fully revealed
-      // The hovered card needs to clear the card above it
       const revealOffset = cardH - stackOff + HOVER_GAP;
       return index * stackOff + revealOffset;
     },
-    [hoveredIndex, selectedIndex, isMobile, cardH, stackOff]
+    [hoveredIndex, selectedIndex, cardH, stackOff]
   );
 
   const getCardOpacity = useCallback(
@@ -702,20 +701,19 @@ export default function CardStack({ onExpandChange, closeRef }: CardStackProps) 
 
   const isExpanded = selectedIndex !== null;
 
-  // Calculate the total height of the card stack based on hover/expand state
+  // Calculate the total height of the card stack
   const stackHeight = useMemo(() => {
     if (isExpanded) return cardH;
     if (hoveredIndex === null || hoveredIndex === 0) {
       return (projects.length - 1) * stackOff + cardH;
     }
-    // When hovering, the stack expands by the reveal offset
     const revealOffset = cardH - stackOff + HOVER_GAP;
     return (projects.length - 1) * stackOff + cardH + revealOffset;
-  }, [hoveredIndex, isExpanded, isMobile, cardH, stackOff]);
+  }, [hoveredIndex, isExpanded, cardH, stackOff]);
 
   // Scroll to center the hovered card when hover changes
   useEffect(() => {
-    if (hoveredIndex === null || isExpanded) return;
+    if (hoveredIndex === null || isExpanded || isMobile) return;
 
     let cardY: number;
     if (hoveredIndex === 0) {

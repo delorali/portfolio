@@ -30,6 +30,7 @@ interface ShowcaseCard {
 
 interface ProcessSection {
   title: string;
+  headline?: string;
   italicSubtitle?: string;
   description?: string;
   bullets?: string[];
@@ -90,15 +91,36 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Video progress tracking — use RAF for smooth updates
+  // Query the wrapper for a visible, playing video instead of relying on a single ref,
+  // since desktop/mobile layouts render duplicate video elements simultaneously.
   useEffect(() => {
     if (!isVideoCard && !(isMultiLayout && hasVideo)) return;
     let rafId: number;
 
     const tick = () => {
-      const video = videoRef.current;
-      if (video && video.duration) {
-        setVideoProgress(video.currentTime / video.duration);
-        setVideoTime({ current: video.currentTime, duration: video.duration });
+      const wrapper = wrapperRef.current;
+      if (wrapper) {
+        const videos = wrapper.querySelectorAll("video");
+        let activeVideo: HTMLVideoElement | null = null;
+        for (const v of videos) {
+          if (!v.paused && v.duration) {
+            activeVideo = v;
+            break;
+          }
+        }
+        if (!activeVideo) {
+          // Fallback to any video with duration
+          for (const v of videos) {
+            if (v.duration) {
+              activeVideo = v;
+              break;
+            }
+          }
+        }
+        if (activeVideo) {
+          setVideoProgress(activeVideo.currentTime / activeVideo.duration);
+          setVideoTime({ current: activeVideo.currentTime, duration: activeVideo.duration });
+        }
       }
       rafId = requestAnimationFrame(tick);
     };
@@ -146,7 +168,7 @@ function ShowcaseCardSection({ card, isDark }: { card: ShowcaseCard; isDark: boo
       className="relative w-full"
       style={{ height: wrapperHeight }}
     >
-      <div className="sticky top-4 md:top-[calc(100vh-clamp(500px,55vw,788px))] px-3 md:px-[80px] lg:px-[120px]" style={{ height: "auto", minHeight: "0" }}>
+      <div className="sticky top-4 md:top-[72px] px-3 md:px-[80px] lg:px-[120px]" style={{ height: "auto", minHeight: "0" }}>
       <div
         className="flex flex-col md:flex-row w-full md:h-[clamp(500px,55vw,788px)] rounded-[16px] overflow-hidden"
         style={{
@@ -711,19 +733,15 @@ function getShowcaseCards(projectId: string): ShowcaseCard[] {
 function getProcessSections(projectId: string): ProcessSection[] {
   if (projectId === "kickback") return [
     {
-      title: "Tech stack",
-      description: "The breakdown of technologies for not only design, front-end, and back-end, but also the AI stack for training and deploying LFMs.",
-      image: "/projects/kickback-tech-stack.png",
-      aspectRatio: "826/521",
+      title: "Value proposition.",
+      headline: "Gen Z relies on group chats to stay close with friends. Market trends show they\u2019re using these spaces to prompt real-time photo updates\u2014creating a more intimate, private version of BeReal.",
+      description: "A social app that helps friend groups build intimacy and stay connected through simple, real-time photo and prompt sharing, capitalizing on Gen Z\u2019s desire to participate in connection efforts with their close, intimate friend groups online.",
     },
     {
-      title: "User flows and wireframes",
-      description: "Diagrams and low-fidelity explorations of the core flow — creating a hangout, inviting friends, and the real-time coordination experience.",
-      images: [
-        { src: "/projects/kickback-userflow.png", aspectRatio: "854/583" },
-        { src: "/projects/kickback-wireframes.png", aspectRatio: "830/1089" },
-      ],
-      imagesLayout: "stacked" as const,
+      title: "The narrative",
+      description: "Through competitive analysis, brainstorming, and ranking of the different ideas we had, we were able to craft a narrative that defined a list of features to achieve our goal, without overcomplicating the solution space.",
+      image: "/projects/kickback-narrative.png",
+      aspectRatio: "732/462",
     },
     {
       title: "Iteration",
@@ -994,7 +1012,7 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
           <div className="flex flex-col gap-10">
             {processSections.map((section, i) => (
               <div key={i} className="flex flex-col gap-10 pb-4">
-                <div className="flex flex-col gap-3 max-w-[600px]">
+                <div className={`flex flex-col gap-3 ${section.headline ? "max-w-[800px]" : "max-w-[600px]"}`}>
                   <Image
                     src="/projects/star-icon.svg"
                     alt=""
@@ -1008,6 +1026,14 @@ export default function ProjectDetailV2({ project, onClose }: ProjectDetailV2Pro
                   >
                     {section.title}
                   </p>
+                  {section.headline && (
+                    <p
+                      className="text-[24px] md:text-[32px] font-bold leading-[1.2] tracking-[-0.02em] max-w-[800px]"
+                      style={{ color: t.foreground }}
+                    >
+                      {section.headline}
+                    </p>
+                  )}
                   {section.italicSubtitle && (
                     <p className="text-[13px] italic leading-[18px] tracking-[-0.026px]" style={{ color: t.body }}>
                       {section.italicSubtitle}
