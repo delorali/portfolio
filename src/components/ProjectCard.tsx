@@ -53,6 +53,7 @@ export interface Project {
   centerImageOffset?: { y: number };
   backgroundImage?: string;
   backgroundGradient?: string;
+  skyBackground?: string;
   tags?: string[];
   hoverDescription?: string;
   detail?: ProjectDetail;

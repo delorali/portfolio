@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import ProjectCard, { type Project } from "./ProjectCard";
 import ProjectDetail from "./ProjectDetail";
+import ProjectDetailV2 from "./ProjectDetailV2";
 import { Badge } from "./ui/badge";
 
 export type { Project };
@@ -41,6 +42,7 @@ const projects: Project[] = [
     hoverDescription:
       "Pioneered 3D geospatial applications for defense—designing across space operations, AI-powered military planning, and autonomous vehicle operations.",
     backgroundImage: "/projects/gotham-bg.png",
+    skyBackground: "/projects/gotham-sky-bg.png",
     logo: (
       <div className="flex items-center gap-3">
         <div className="relative h-[22px] w-[17px]">
@@ -129,6 +131,7 @@ const projects: Project[] = [
       "Drove end-to-end design on foundational data entry and ontology initiatives—each adopted immediately by tens of thousands of daily users across critical workflows.",
     centerImage: "/projects/foundry-logo.svg",
     centerImageSize: { width: 124, height: 141 },
+    skyBackground: "/projects/sky-bg.png",
     logo: (
       <div className="flex items-center gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -140,12 +143,11 @@ const projects: Project[] = [
     ),
     detail: {
       duration: "April 2024 to November 2025",
-      role: "The sole product designer for the Ontology Actions team within Foundry. During my time on Foundry Actions, I led key design and product initiatives that powered the way Palantir's entire forward-deployed suite builds, edits, and operates on client data. I drove end-to-end execution on foundational features—each of which was adopted immediately by tens of thousands of daily users across critical workflows. This work required deep product fluency, crisp strategic alignment, and tight collaboration with design, product, and engineering partners to ensure we delivered tools that were both powerful and intuitive at scale.",
+      role: "The sole product designer for the Ontology Actions team within Foundry. During my time on Foundry Actions, I designed product initiatives that powered the way Palantir's forward-deployed suite builds, edits, and operates on client data. I drove end-to-end execution on foundational data entry and ontology features—each of which was adopted immediately by tens of thousands of daily users across critical workflows.\n\nThis work required deep product fluency, crisp strategic alignment, and tight collaboration with design, product, and engineering partners to ensure we delivered tools that were both powerful and intuitive at scale.",
       contextHeadline:
-        "Palantir Foundry is a platform for data integration and analytics, enabling organizations to manage and operationalize complex data at scale.",
+        "Palantir Foundry is a platform for data integration and analytics, enabling organizations to manage and operationalize complex data at scale. A core feature to Foundry is its Ontology, a semantic layer that maps raw data to real-world business concepts like Customer, Product, or Facility.",
       context: [
-        "A core feature to Foundry is its Ontology, a semantic layer that maps raw data to real-world business concepts like Customer, Product, or Facility. Through structured relationships and inheritance, data from differing sources is mapped into a clear, reusable, and governed framework that abstracts technical complexity.",
-        "Actions are similar to functions or methods in coding, each representing a command that can create, modify, or delete objects within Palantir's Ontology.",
+        "Through structured relationships and inheritance, data from differing sources is mapped into a clear, reusable, and governed framework that abstracts technical complexity. Actions are similar to functions or methods in coding, each representing a command that can create, modify, or delete objects within Palantir's Ontology.",
       ],
       sections: [
         {
@@ -213,12 +215,15 @@ const projects: Project[] = [
     title: "Baba",
     year: "2026",
     isDark: false,
-    tags: ["Consumer", "Healthcare", "Contractor"],
+    tags: ["Consumer", "Healthcare", "Contract"],
     hoverDescription:
       "Redesigned the patient experience for an eldercare start-up—from the application to the onboarding process over a 2-week contract.",
     backgroundGradient:
-      "linear-gradient(180deg, rgba(186, 221, 255, 0.78) 0%, rgba(220, 232, 243, 0.538) 50%, rgba(254, 255, 232, 0.296) 100%), linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 100%)",
-    backgroundImage: "/projects/baba-card-clouds.png",
+      "linear-gradient(180deg, #f4f4f5 0%, #ffffff 100%)",
+    centerImage: "/projects/Baba logo.svg",
+    centerImageSize: { width: 160, height: 112 },
+    centerImageOffset: { y: -20 },
+    skyBackground: "/projects/baba-sky-bg.png",
     logo: (
       <div className="relative h-[24px] w-[72px]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -339,6 +344,7 @@ const projects: Project[] = [
     hoverDescription:
       "A mobile app that transforms raw study notes into personalized AI-generated flashcard decks and delivers an intelligent coaching experience.",
     backgroundImage: "/projects/kumu-card-bg.png",
+    skyBackground: "/projects/baba-sky-bg.png",
     logo: (
       <div className="flex items-center gap-3">
         <div className="relative h-[24px] w-[22px]">
@@ -475,8 +481,9 @@ const projects: Project[] = [
     centerImage: "/projects/kickback-phone-mockup.png",
     centerImageSize: { width: 230, height: 470 },
     centerImageOffset: { y: 127 },
+    skyBackground: "/projects/kickback-sky-bg.png",
     detail: {
-      duration: "February 2026 • 2 weeks",
+      duration: "Sept 2024 • 4 weeks",
       role: "As the product designer, I worked a small team of 3 other developers to create the product narrative, before designing the high fidelity end-to-end workflows and design systems. Responsibilities included product strategy, interaction design, and visual design.",
       contextHeadline:
         "Kickback, the \u201CBeReal for friend groups\u201D: a social platform where friends can effortlessly plan hangouts — eliminating the endless group chat coordination and making spontaneous meetups the norm, not the exception.",
@@ -598,7 +605,7 @@ const projects: Project[] = [
 ];
 
 interface CardStackProps {
-  onExpandChange?: (expanded: boolean) => void;
+  onExpandChange?: (expanded: boolean, projectId?: string, skyBackground?: string) => void;
   closeRef?: React.MutableRefObject<(() => void) | null>;
 }
 
@@ -659,11 +666,10 @@ export default function CardStack({ onExpandChange, closeRef }: CardStackProps) 
         return index * stackOff;
       }
       // Hovered card + cards below: shift down so hovered card is fully revealed
-      // The hovered card needs to clear the card above it
       const revealOffset = cardH - stackOff + HOVER_GAP;
       return index * stackOff + revealOffset;
     },
-    [hoveredIndex, selectedIndex, isMobile, cardH, stackOff]
+    [hoveredIndex, selectedIndex, cardH, stackOff]
   );
 
   const getCardOpacity = useCallback(
@@ -686,7 +692,7 @@ export default function CardStack({ onExpandChange, closeRef }: CardStackProps) 
     setSelectedIndex(null);
     setHoveredIndex(null);
     onExpandChange?.(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, [onExpandChange]);
 
   useEffect(() => {
@@ -695,20 +701,19 @@ export default function CardStack({ onExpandChange, closeRef }: CardStackProps) 
 
   const isExpanded = selectedIndex !== null;
 
-  // Calculate the total height of the card stack based on hover/expand state
+  // Calculate the total height of the card stack
   const stackHeight = useMemo(() => {
     if (isExpanded) return cardH;
     if (hoveredIndex === null || hoveredIndex === 0) {
       return (projects.length - 1) * stackOff + cardH;
     }
-    // When hovering, the stack expands by the reveal offset
     const revealOffset = cardH - stackOff + HOVER_GAP;
     return (projects.length - 1) * stackOff + cardH + revealOffset;
-  }, [hoveredIndex, isExpanded, isMobile, cardH, stackOff]);
+  }, [hoveredIndex, isExpanded, cardH, stackOff]);
 
   // Scroll to center the hovered card when hover changes
   useEffect(() => {
-    if (hoveredIndex === null || isExpanded) return;
+    if (hoveredIndex === null || isExpanded || isMobile) return;
 
     let cardY: number;
     if (hoveredIndex === 0) {
@@ -812,7 +817,7 @@ export default function CardStack({ onExpandChange, closeRef }: CardStackProps) 
                       handleClose();
                     } else {
                       setHoveredIndex(null);
-                      onExpandChange?.(true);
+                      onExpandChange?.(true, project.id, project.skyBackground);
                       window.scrollTo({ top: 0, behavior: "instant" });
                       requestAnimationFrame(() => {
                         setSelectedIndex(index);
@@ -836,10 +841,17 @@ export default function CardStack({ onExpandChange, closeRef }: CardStackProps) 
             transition={{ ...expandTransition, delay: 0.35 }}
             className="w-full"
           >
-            <ProjectDetail
-              project={projects[selectedIndex]}
-              onClose={handleClose}
-            />
+            {projects[selectedIndex].id === "gotham" || projects[selectedIndex].id === "foundry" || projects[selectedIndex].id === "baba" || projects[selectedIndex].id === "kumu" || projects[selectedIndex].id === "kickback" ? (
+              <ProjectDetailV2
+                project={projects[selectedIndex]}
+                onClose={handleClose}
+              />
+            ) : (
+              <ProjectDetail
+                project={projects[selectedIndex]}
+                onClose={handleClose}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>

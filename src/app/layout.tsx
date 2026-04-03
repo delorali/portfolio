@@ -11,6 +11,18 @@ export const metadata: Metadata = {
   title: "Delora Li — Design Portfolio",
   description:
     "Product designer specializing in complex, data-rich challenges.",
+  icons: {
+    icon: [
+      {
+        url: "/Logo/Logo/Light.svg",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/Logo/Logo/Dark.svg",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
