@@ -34,7 +34,7 @@ export default function Header({ isProjectOpen, isDarkProject, onBack }: HeaderP
       </div>
       <div className="flex items-center gap-2">
         <a
-          href="/resume.pdf"
+          href="/DeloraLiResume.pdf"
           target="_blank"
           rel="noopener noreferrer"
           className={`flex items-center gap-2 rounded-[10px] border px-4 py-2 text-[15px] font-medium leading-normal transition-colors ${
