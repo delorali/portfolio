@@ -43,8 +43,7 @@ export default function Hero() {
           transition={{ ...springTransition, delay: 0.1 }}
         >
           <p className="text-[15px] md:text-[17px] md:font-medium leading-[20px] md:leading-[22px] tracking-[-0.06px] md:tracking-[-0.068px] text-foreground">
-            <span className="md:hidden">Leading design @ Liquid AI.</span>
-            <span className="hidden md:inline">Currently leading design @ Liquid AI.</span>
+            Product designer @ Liquid AI.
           </p>
           <div className="flex gap-1 text-[13px] md:text-[15px] leading-[18px] md:leading-[20px] tracking-[-0.026px] md:tracking-[-0.06px]">
             <span className="text-foreground">Previously @</span>
